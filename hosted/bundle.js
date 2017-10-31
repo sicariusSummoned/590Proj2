@@ -63,21 +63,20 @@ var redraw = function redraw(time) {
     30, 20);
 
     ctx.restore();
+  }
 
-    for (var _i = 0; _i < bulletKeys.length; _i++) {
-      var bullet = bullets[bulletKeys[_i]];
+  for (var _i = 0; _i < bulletKeys.length; _i++) {
+    var bullet = bullets[bulletKeys[_i]];
 
-      if (bullet.hash === hash) {
-        ctx.filter = "none";
-      } else {
-        ctx.filter = "hue-Rotate(90deg)";
-      }
-
-      ctx.drawImage(bulletImg, bulletSize.WIDTH, bulletSize.HEIGHT, bulletSize.WIDTH, bulletSize.HEIGHT, bullet.x, bullet.y, bulletSize.WIDTH, bulletSize.HEIGHT);
+    if (bullet.hash === hash) {
+      ctx.filter = "none";
+    } else {
+      ctx.filter = "hue-Rotate(90deg)";
     }
 
-    animationFrame = requestAnimationFrame(redraw);
+    ctx.drawImage(bulletImg, bulletSize.WIDTH, bulletSize.HEIGHT, bulletSize.WIDTH, bulletSize.HEIGHT, bullet.x, bullet.y, bulletSize.WIDTH, bulletSize.HEIGHT);
   }
+  animationFrame = requestAnimationFrame(redraw);
 };
 'use strict';
 

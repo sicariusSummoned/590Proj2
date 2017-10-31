@@ -18,7 +18,7 @@ const bulletSize = {
 
 const redraw = (time) => {
   update();
-  
+
   ctx.filter = "none";
   ctx.clearRect(0, 0, screenWidth, screenHeight);
   ctx.drawImage(bgImg, 0, 0, screenWidth, screenHeight);
@@ -57,9 +57,7 @@ const redraw = (time) => {
       0,
       0,
       hullSize.WIDTH,
-      hullSize.HEIGHT,
-      -25, 
-      -27,
+      hullSize.HEIGHT, -25, -27,
       50,
       54,
     );
@@ -75,8 +73,7 @@ const redraw = (time) => {
       0,
       0,
       turretSize.WIDTH,
-      turretSize.HEIGHT, 
-      -7, //add half of hull width
+      turretSize.HEIGHT, -7, //add half of hull width
       -10, //add half of hull height
       30,
       20,
@@ -84,28 +81,31 @@ const redraw = (time) => {
 
     ctx.restore();
 
-    for (let i = 0; i < bulletKeys.length; i++) {
-      const bullet = bullets[bulletKeys[i]];
 
-      if (bullet.hash === hash) {
-        ctx.filter = "none"
-      } else {
-        ctx.filter = "hue-Rotate(90deg)";
-      }
 
-      ctx.drawImage(
-        bulletImg,
-        bulletSize.WIDTH,
-        bulletSize.HEIGHT,
-        bulletSize.WIDTH,
-        bulletSize.HEIGHT,
-        bullet.x,
-        bullet.y,
-        bulletSize.WIDTH,
-        bulletSize.HEIGHT
-      );
+
+  }
+
+  for (let i = 0; i < bulletKeys.length; i++) {
+    const bullet = bullets[bulletKeys[i]];
+
+    if (bullet.hash === hash) {
+      ctx.filter = "none"
+    } else {
+      ctx.filter = "hue-Rotate(90deg)";
     }
 
-    animationFrame = requestAnimationFrame(redraw);
+    ctx.drawImage(
+      bulletImg,
+      bulletSize.WIDTH,
+      bulletSize.HEIGHT,
+      bulletSize.WIDTH,
+      bulletSize.HEIGHT,
+      bullet.x,
+      bullet.y,
+      bulletSize.WIDTH,
+      bulletSize.HEIGHT
+    );
   }
+  animationFrame = requestAnimationFrame(redraw);
 };
