@@ -1,0 +1,37 @@
+{
+  "name": "590proj2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/app.js",
+  "scripts": {
+    "start": "node ./src/app.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests complete\"",
+    "nodemon": "nodemon --watch ./src ./src/app.js",
+    "build": "babel ./client --out-file ./hosted/bundle.js",
+    "watch": "babel --watch ./client --out-file ./hosted/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sicariusSummoned/590Proj2.git"
+  },
+  "author": "James Taggart",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sicariusSummoned/590Proj2/issues"
+  },
+  "homepage": "https://github.com/sicariusSummoned/590Proj2#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4",
+    "xxhashjs": "^0.2.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "nodemon": "^1.12.1"
+  }
+}
