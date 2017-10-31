@@ -58,7 +58,7 @@ var redraw = function redraw(time) {
     ctx.save();
     ctx.translate(player.x, player.y);
     ctx.rotate(player.turretRotation * (Math.PI / 180));
-    ctx.drawImage(tankTurretImg, 0, 0, turretSize.WIDTH, turretSize.HEIGHT, -15, //add half of hull width
+    ctx.drawImage(tankTurretImg, 0, 0, turretSize.WIDTH, turretSize.HEIGHT, -7, //add half of hull width
     -10, //add half of hull height
     30, 20);
 
@@ -219,14 +219,13 @@ var syncBullets = function syncBullets(data) {
 };
 
 var syncPlayers = function syncPlayers(data) {
-  console.log('syncing');
-  console.dir(data);
   players = data;
 };
 
 var setPlayer = function setPlayer(data) {
   console.log('calling setUser');
-  //console.dir(data);
+  console.log('I am:');
+  console.dir(data);
   hash = data.hash;
   players[hash] = data;
   requestAnimationFrame(redraw);

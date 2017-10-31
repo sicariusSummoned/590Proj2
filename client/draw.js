@@ -76,7 +76,7 @@ const redraw = (time) => {
       0,
       turretSize.WIDTH,
       turretSize.HEIGHT, 
-      -15, //add half of hull width
+      -7, //add half of hull width
       -10, //add half of hull height
       30,
       20,

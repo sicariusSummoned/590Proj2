@@ -22,14 +22,13 @@ const syncBullets = (data) => {
 };
 
 const syncPlayers = (data) => {
-  console.log('syncing');
-  console.dir(data);
   players = data;
 };
 
 const setPlayer = (data) => {
   console.log('calling setUser');
-  //console.dir(data);
+  console.log('I am:');
+  console.dir(data);
   hash = data.hash;
   players[hash] = data;
   requestAnimationFrame(redraw);

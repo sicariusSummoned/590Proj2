@@ -56,10 +56,12 @@ const onDisconnect = (sock) => {
 
     //remove user data from users
     utility.removePlayer(socket.hash);
+    console.dir(utility.getPlayers());
     //Decrement number of players online
     numOnline--;
-    sendPlayers();
     socket.leave();
+    sendPlayers();
+
   })
 };
 
@@ -88,15 +90,13 @@ const serverUpdate = () => {
 
     utility.setBullet(bullet);
   }
-  
-  sendPlayers();
+
 };
 
 const onReceiveTurning = (sock) => {
   const socket = sock;
 
   socket.on('turning', (data) => {
-    console.log('turning on server');
     let player = data;
 
     if (player.turningLeft) {
@@ -109,8 +109,7 @@ const onReceiveTurning = (sock) => {
 
     utility.setPlayer(player);
 
-    console.dir(player.hullRotation);
-    let asRad = player.hullRotation * (Math.PI/180);
+    let asRad = player.hullRotation * (Math.PI / 180);
 
     player.fX = Math.cos(asRad);
     player.fY = Math.sin(asRad);
@@ -124,8 +123,6 @@ const onReceiveUpdate = (sock) => {
   socket.on('playerUpdate', (data) => {
     if (data != null && data != undefined) {
       utility.setPlayer(data);
-
-      sendPlayers();
     }
   });
 }
@@ -141,6 +138,7 @@ const configure = (ioServer) => {
 
     const hash = xxh.h32(`${socket.id}${new Date().getTime()}`, 0xCAFEBABB).toString(16);
 
+    socket.hash = hash;
     //fX = cos(theta)
     //fY = sin(theta)
 
@@ -177,10 +175,14 @@ const configure = (ioServer) => {
     onThrottleUp(socket);
     onReceiveUpdate(socket);
     onReceiveTurning(socket);
-    if (!runOnce) {
+    if (runOnce ===false) {
+      console.log('running once?');
       setInterval(serverUpdate, 30);
+      setInterval(sendPlayers, 100);
       runOnce = true;
     }
+
+    console.dir(utility.getPlayers());
 
   });
 };
