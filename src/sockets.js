@@ -12,9 +12,11 @@ const sendPlayers = () => {
   io.sockets.in('room1').emit('syncPlayers', utility.getPlayers());
 };
 
+/**
 const sendBullets = () => {
   io.sockets.in('room1').emit('syncBullets', utility.getBullets());
 };
+* */
 
 const onThrottleUp = (sock) => {
   const socket = sock;
@@ -128,7 +130,8 @@ const onTurretUpdate = (sock) => {
 const configure = (ioServer) => {
   io = ioServer;
 
-  io.on('connection', (socket) => {
+  io.on('connection', (sock) => {
+    const socket = sock;
     console.log('connection started');
 
     socket.join('room1');
