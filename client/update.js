@@ -5,7 +5,7 @@ const updatePlayers = () => {
     player.x += player.speed * player.fX;
     player.y += player.speed * player.fY;
   }
-  
+
 };
 
 const updateBullets = () => {
@@ -18,11 +18,25 @@ const updateBullets = () => {
 };
 
 const syncBullets = (data) => {
-  bullets = data;
+  //bullets = data;
 };
 
 const syncPlayers = (data) => {
-  players = data;
+
+  if (!players[data.hash]) {
+    players[data.hash] = data;
+    return;
+  }
+
+
+  const player = players[data.hash];
+  player.x = data.x;
+  player.y = data.y;
+  player.fX = data.fX;
+  player.fY = data.fY;
+  player.speed = data.speed;
+  player.hullRotation = data.hullRotation;
+  player.turretRotation = data.turretRotation;
 };
 
 const setPlayer = (data) => {
@@ -38,5 +52,5 @@ const setPlayer = (data) => {
 
 const update = () => {
   updatePlayers()
-  socket.emit('playerUpdate', players[hash]);
+
 };

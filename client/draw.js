@@ -17,8 +17,8 @@ const bulletSize = {
 };
 
 const redraw = (time) => {
-  //console.dir(players);
-
+  update();
+  
   ctx.filter = "none";
   ctx.clearRect(0, 0, screenWidth, screenHeight);
   ctx.drawImage(bgImg, 0, 0, screenWidth, screenHeight);

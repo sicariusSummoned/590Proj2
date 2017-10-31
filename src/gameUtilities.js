@@ -7,15 +7,11 @@ let bullets = {};
 const getPlayers = () => players;
 const getBullets = () => bullets;
 
-//send hash receive player
-const getPlayer = (data) => {
-  return players[data];
-};
+// send hash receive player
+const getPlayer = data => players[data];
 
-//send hash receive bullet
-const getBullet = (data) =>{
-  return bullets[data];
-};
+// send hash receive bullet
+const getBullet = data => bullets[data];
 
 const setPlayers = (data) => {
   players = data;
@@ -32,19 +28,19 @@ const setPlayer = (data) => {
 const setBullet = (data) => {
   bullets[data.hash] = data;
 };
-//send hash delete player
+// send hash delete player
 const removePlayer = (data) => {
   delete players[data];
 };
-//send hash delete bullet
+// send hash delete bullet
 const removeBullet = (data) => {
   delete bullets[data];
 };
 
-//pass in position and radius of both colliders
-//Will return true on a hit
+// pass in position and radius of both colliders
+// Will return true on a hit
 const checkHit = (x1, y1, r1, x2, y2, r2) => {
-  let thickness = r1 + r2;
+  const thickness = r1 + r2;
   if (x1 < x2 + thickness && x1 > x2 - thickness) {
     if (y1 < y2 + thickness && y1 > y2 - thickness) {
       return true;
@@ -56,7 +52,7 @@ const checkHit = (x1, y1, r1, x2, y2, r2) => {
 
 const cullBullets = (data) => {
   if (data !== null && data !== undefined) {
-    const bullets = data;
+    bullets = data;
     const keys = Object.keys(bullets);
 
     for (let i = 0; i < keys.length; i++) {
@@ -73,7 +69,6 @@ const cullBullets = (data) => {
 };
 
 
-
 module.exports = {
   screenHeight,
   screenWidth,
@@ -87,4 +82,6 @@ module.exports = {
   removeBullet,
   getBullet,
   getPlayer,
-}
+  checkHit,
+  cullBullets,
+};

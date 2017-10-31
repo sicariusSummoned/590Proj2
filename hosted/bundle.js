@@ -19,7 +19,7 @@ var bulletSize = {
 };
 
 var redraw = function redraw(time) {
-  //console.dir(players);
+  update();
 
   ctx.filter = "none";
   ctx.clearRect(0, 0, screenWidth, screenHeight);
@@ -121,14 +121,14 @@ var keyDownHandler = function keyDownHandler(e) {
     console.log('turning left');
     player.turningLeft = true;
     player.turningRight = false;
-    socket.emit('turning', player);
+    socket.emit('turning', player.hash);
   }
   // D OR RIGHT
   else if (keyPressed === 68 || keyPressed === 39) {
       player.turningRight = true;
       player.turningLeft = false;
       console.log('turning right');
-      socket.emit('turning', player);
+      socket.emit('turning', player.hash);
     }
 };
 
@@ -143,7 +143,7 @@ var keyUpHandler = function keyUpHandler(e) {
   // A OR LEFT
   else if (keyPressed === 65 || keyPressed === 37) {
       player.turningLeft = false;
-      socket.emit('turning', player);
+      socket.emit('turning', player.hash);
     }
     // S OR DOWN
     else if (keyPressed === 83 || keyPressed === 40) {
@@ -152,7 +152,7 @@ var keyUpHandler = function keyUpHandler(e) {
       // D OR RIGHT
       else if (keyPressed === 68 || keyPressed === 39) {
           player.turningRight = false;
-          socket.emit('turning', player);
+          socket.emit('turning', player.hash);
         }
         // SPACE
         else if (keyPressed === 32) {
@@ -183,14 +183,13 @@ var init = function init() {
     var player = players[hash];
     player.turretRotation = angleDegBetweenPoints(player.x, player.y, mousePosition.x, mousePosition.y);
 
-    socket.emit('playerUpdate', player);
+    var packet = {
+      turretRotation: player.turretRotation,
+      hash: player.hash
+    };
+
+    socket.emit('turretUpdate', packet);
   }, false);
-
-  console.dir(tankHullImg);
-  console.dir(tankTurretImg);
-  console.dir(bgImg);
-
-  setInterval(update, 30);
 };
 
 window.onload = init;
@@ -215,11 +214,24 @@ var updateBullets = function updateBullets() {
 };
 
 var syncBullets = function syncBullets(data) {
-  bullets = data;
+  //bullets = data;
 };
 
 var syncPlayers = function syncPlayers(data) {
-  players = data;
+
+  if (!players[data.hash]) {
+    players[data.hash] = data;
+    return;
+  }
+
+  var player = players[data.hash];
+  player.x = data.x;
+  player.y = data.y;
+  player.fX = data.fX;
+  player.fY = data.fY;
+  player.speed = data.speed;
+  player.hullRotation = data.hullRotation;
+  player.turretRotation = data.turretRotation;
 };
 
 var setPlayer = function setPlayer(data) {
@@ -233,5 +245,4 @@ var setPlayer = function setPlayer(data) {
 
 var update = function update() {
   updatePlayers();
-  socket.emit('playerUpdate', players[hash]);
 };

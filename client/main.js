@@ -19,7 +19,7 @@ let mousePosition = {
 
 const angleDegBetweenPoints = (x1, y1, x2, y2) => {
   return Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
-}
+};
 
 const getMousePosition = (canvas, evt) => {
   let rect = canvas.getBoundingClientRect();
@@ -40,14 +40,14 @@ const keyDownHandler = (e) => {
     console.log('turning left');
     player.turningLeft = true;
     player.turningRight = false;
-    socket.emit('turning', player);
+    socket.emit('turning', player.hash);
   }
   // D OR RIGHT
   else if (keyPressed === 68 || keyPressed === 39) {
     player.turningRight = true;
     player.turningLeft = false;
     console.log('turning right');
-    socket.emit('turning', player);
+    socket.emit('turning', player.hash);
 
   }
 };
@@ -63,7 +63,7 @@ const keyUpHandler = (e) => {
   // A OR LEFT
   else if (keyPressed === 65 || keyPressed === 37) {
     player.turningLeft = false;
-    socket.emit('turning', player);
+    socket.emit('turning', player.hash);
 
   }
   // S OR DOWN
@@ -74,7 +74,7 @@ const keyUpHandler = (e) => {
   // D OR RIGHT
   else if (keyPressed === 68 || keyPressed === 39) {
     player.turningRight = false;
-    socket.emit('turning', player);
+    socket.emit('turning', player.hash);
 
   }
   // SPACE
@@ -108,14 +108,15 @@ const init = () => {
     let player = players[hash];
     player.turretRotation = angleDegBetweenPoints(player.x, player.y, mousePosition.x, mousePosition.y);
 
-    socket.emit('playerUpdate', player);
+    let packet = {
+      turretRotation: player.turretRotation,
+      hash: player.hash
+    };
+    
+    socket.emit('turretUpdate', packet);
   }, false);
 
-  console.dir(tankHullImg);
-  console.dir(tankTurretImg);
-  console.dir(bgImg);
 
-  setInterval(update, 30);
 
 }
 
