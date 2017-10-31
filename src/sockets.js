@@ -100,17 +100,17 @@ const onReceiveTurning = (sock) => {
     let player = data;
 
     if (player.turningLeft) {
-      player.hullRotation -= 20;
+      player.hullRotation -= 10;
     }
 
     if (player.turningRight) {
-      player.hullRotation += 20;
+      player.hullRotation += 10;
     }
 
     utility.setPlayer(player);
 
     console.dir(player.hullRotation);
-    let asRad = player.hullRotation * 0.01745329252;
+    let asRad = player.hullRotation * (Math.PI/180);
 
     player.fX = Math.cos(asRad);
     player.fY = Math.sin(asRad);
@@ -145,8 +145,8 @@ const configure = (ioServer) => {
     //fY = sin(theta)
 
     let Player = {
-      x: 0,
-      y: 0,
+      x: 100,
+      y: 100,
       fX: 1,
       fY: 0,
       speed: 0,
@@ -162,7 +162,7 @@ const configure = (ioServer) => {
     //Increment number of players online
     numOnline++;
     //send this back to the client
-    io.sockets.in('room1').emit('playerCreated', utility.getPlayer(Player.hash));
+    socket.emit('playerCreated', utility.getPlayer(Player.hash));
     //If the number of active players is 
     //greater than two let the game begin
     if (numOnline > 2) {

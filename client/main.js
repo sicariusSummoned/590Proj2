@@ -11,6 +11,23 @@ let animationFrame;
 
 let players = {};
 let bullets = {};
+let mousePosition = {
+  x: 0,
+  y: 0
+};
+
+
+const angleDegBetweenPoints = (x1, y1, x2, y2) => {
+  return Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+}
+
+const getMousePosition = (canvas, evt) => {
+  let rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+};
 
 const keyDownHandler = (e) => {
   var keyPressed = e.which;
@@ -86,6 +103,13 @@ const init = () => {
 
   document.body.addEventListener('keydown', keyDownHandler);
   document.body.addEventListener('keyup', keyUpHandler);
+  window.addEventListener('mousemove', function (evt) {
+    mousePosition = getMousePosition(canvas, evt);
+    let player = players[hash];
+    player.turretRotation = angleDegBetweenPoints(player.x, player.y, mousePosition.x, mousePosition.y);
+
+    socket.emit('playerUpdate', player);
+  }, false);
 
   console.dir(tankHullImg);
   console.dir(tankTurretImg);

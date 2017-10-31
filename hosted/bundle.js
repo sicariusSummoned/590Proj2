@@ -9,8 +9,8 @@ var hullSize = {
 };
 
 var turretSize = {
-  WIDTH: 78,
-  HEIGHT: 151
+  WIDTH: 151,
+  HEIGHT: 78
 };
 
 var bulletSize = {
@@ -46,26 +46,21 @@ var redraw = function redraw(time) {
         }
       }
     }
-    ctx.save();
-    ctx.fillStyle = 'yellow';
-    ctx.fillRect(player.x, player.y, 20, 20);
 
     ctx.save();
 
     ctx.translate(player.x, player.y);
-    ctx.rotate(player.hullRotation * 0.01745329252);
-    ctx.drawImage(tankHullImg, 0, 0, hullSize.WIDTH * player.frame, hullSize.HEIGHT, player.x - 25, player.y - 27, 50, 54);
+    ctx.rotate(player.hullRotation * (Math.PI / 180));
+    ctx.drawImage(tankHullImg, 0, 0, hullSize.WIDTH, hullSize.HEIGHT, -25, -27, 50, 54);
 
-    ctx.strokeRect(player.x - 25, player.y - 27, 50, 54);
     ctx.restore();
 
     ctx.save();
     ctx.translate(player.x, player.y);
-    ctx.rotate(player.turretRotation * 0.01745329252);
-    ctx.drawImage(tankTurretImg, 0, 0, turretSize.WIDTH, turretSize.HEIGHT, player.x - 10, //add half of hull width
-    player.y - 15, //add half of hull height
-    20, 30);
-    ctx.strokeRect(player.x - 10, player.y - 15, 20, 30);
+    ctx.rotate(player.turretRotation * (Math.PI / 180));
+    ctx.drawImage(tankTurretImg, 0, 0, turretSize.WIDTH, turretSize.HEIGHT, -15, //add half of hull width
+    -10, //add half of hull height
+    30, 20);
 
     ctx.restore();
 
@@ -99,6 +94,22 @@ var animationFrame = void 0;
 
 var players = {};
 var bullets = {};
+var mousePosition = {
+  x: 0,
+  y: 0
+};
+
+var angleDegBetweenPoints = function angleDegBetweenPoints(x1, y1, x2, y2) {
+  return Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+};
+
+var getMousePosition = function getMousePosition(canvas, evt) {
+  var rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+};
 
 var keyDownHandler = function keyDownHandler(e) {
   var keyPressed = e.which;
@@ -167,6 +178,13 @@ var init = function init() {
 
   document.body.addEventListener('keydown', keyDownHandler);
   document.body.addEventListener('keyup', keyUpHandler);
+  window.addEventListener('mousemove', function (evt) {
+    mousePosition = getMousePosition(canvas, evt);
+    var player = players[hash];
+    player.turretRotation = angleDegBetweenPoints(player.x, player.y, mousePosition.x, mousePosition.y);
+
+    socket.emit('playerUpdate', player);
+  }, false);
 
   console.dir(tankHullImg);
   console.dir(tankTurretImg);
@@ -201,6 +219,8 @@ var syncBullets = function syncBullets(data) {
 };
 
 var syncPlayers = function syncPlayers(data) {
+  console.log('syncing');
+  console.dir(data);
   players = data;
 };
 
@@ -213,14 +233,6 @@ var setPlayer = function setPlayer(data) {
 };
 
 var update = function update() {
-  var pKeys = Object.keys(players);
-  if (pKeys.length > 0) {
-    updatePlayers();
-  }
-
-  var bKeys = Object.keys(bullets);
-  if (bKeys.length > 0) {
-    updateBullets();
-  }
+  updatePlayers();
   socket.emit('playerUpdate', players[hash]);
 };

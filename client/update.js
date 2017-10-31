@@ -5,6 +5,7 @@ const updatePlayers = () => {
     player.x += player.speed * player.fX;
     player.y += player.speed * player.fY;
   }
+  
 };
 
 const updateBullets = () => {
@@ -21,6 +22,8 @@ const syncBullets = (data) => {
 };
 
 const syncPlayers = (data) => {
+  console.log('syncing');
+  console.dir(data);
   players = data;
 };
 
@@ -35,14 +38,6 @@ const setPlayer = (data) => {
 }
 
 const update = () => {
-  let pKeys = Object.keys(players);
-  if (pKeys.length > 0) {
-    updatePlayers();
-  }
-
-  let bKeys = Object.keys(bullets);
-  if (bKeys.length > 0) {
-    updateBullets();
-  }
+  updatePlayers()
   socket.emit('playerUpdate', players[hash]);
 };

@@ -7,8 +7,8 @@ const hullSize = {
 };
 
 const turretSize = {
-  WIDTH: 78,
-  HEIGHT: 151
+  WIDTH: 151,
+  HEIGHT: 78
 };
 
 const bulletSize = {
@@ -46,45 +46,41 @@ const redraw = (time) => {
 
 
     }
-    ctx.save();
-    ctx.fillStyle = 'yellow';
-    ctx.fillRect(player.x,player.y,20,20);
 
     ctx.save();
+
 
     ctx.translate(player.x, player.y);
-    ctx.rotate(player.hullRotation * 0.01745329252);
+    ctx.rotate(player.hullRotation * (Math.PI / 180));
     ctx.drawImage(
       tankHullImg,
       0,
       0,
-      hullSize.WIDTH * player.frame,
+      hullSize.WIDTH,
       hullSize.HEIGHT,
-      player.x - 25,
-      player.y - 27,
+      -25, 
+      -27,
       50,
       54,
     );
 
-    ctx.strokeRect(player.x - 25, player.y - 27, 50, 54);
     ctx.restore();
 
 
     ctx.save();
     ctx.translate(player.x, player.y);
-    ctx.rotate(player.turretRotation * 0.01745329252);
+    ctx.rotate(player.turretRotation * (Math.PI / 180));
     ctx.drawImage(
       tankTurretImg,
       0,
       0,
       turretSize.WIDTH,
-      turretSize.HEIGHT,
-      player.x - 10, //add half of hull width
-      player.y - 15, //add half of hull height
-      20,
+      turretSize.HEIGHT, 
+      -15, //add half of hull width
+      -10, //add half of hull height
       30,
+      20,
     );
-    ctx.strokeRect(player.x - 10, player.y - 15, 20, 30);
 
     ctx.restore();
 
