@@ -21,6 +21,7 @@ var bulletSize = {
 var redraw = function redraw(time) {
   //console.dir(players);
 
+  ctx.filter = "none";
   ctx.clearRect(0, 0, screenWidth, screenHeight);
   ctx.drawImage(bgImg, 0, 0, screenWidth, screenHeight);
 
@@ -38,19 +39,35 @@ var redraw = function redraw(time) {
 
     if (player.frame > 0) {
       if (player.frameCount % 2 === 0) {
-        if (player.frame < 1) {
+        if (player.frame < 2) {
           player.frame++;
         } else {
           player.frame = 0;
         }
       }
     }
+    ctx.save();
+    ctx.fillStyle = 'yellow';
+    ctx.fillRect(player.x, player.y, 20, 20);
 
-    ctx.drawImage(tankHullImg, 0, 0, hullSize.WIDTH * player.frame, hullSize.HEIGHT, player.x, player.y, 50, 54);
+    ctx.save();
 
-    ctx.drawImage(tankTurretImg, 0, 0, turretSize.WIDTH, turretSize.HEIGHT, player.x + 18, //add half of hull width
-    player.y + 20, //add half of hull height
+    ctx.translate(player.x, player.y);
+    ctx.rotate(player.hullRotation * 0.01745329252);
+    ctx.drawImage(tankHullImg, 0, 0, hullSize.WIDTH * player.frame, hullSize.HEIGHT, player.x - 25, player.y - 27, 50, 54);
+
+    ctx.strokeRect(player.x - 25, player.y - 27, 50, 54);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    ctx.rotate(player.turretRotation * 0.01745329252);
+    ctx.drawImage(tankTurretImg, 0, 0, turretSize.WIDTH, turretSize.HEIGHT, player.x - 10, //add half of hull width
+    player.y - 15, //add half of hull height
     20, 30);
+    ctx.strokeRect(player.x - 10, player.y - 15, 20, 30);
+
+    ctx.restore();
 
     for (var _i = 0; _i < bulletKeys.length; _i++) {
       var bullet = bullets[bulletKeys[_i]];
@@ -90,11 +107,17 @@ var keyDownHandler = function keyDownHandler(e) {
 
   // A OR LEFT
   if (keyPressed === 65 || keyPressed === 37) {
-    player.turnLeft = true;
+    console.log('turning left');
+    player.turningLeft = true;
+    player.turningRight = false;
+    socket.emit('turning', player);
   }
   // D OR RIGHT
   else if (keyPressed === 68 || keyPressed === 39) {
-      player.turnRight = true;
+      player.turningRight = true;
+      player.turningLeft = false;
+      console.log('turning right');
+      socket.emit('turning', player);
     }
 };
 
@@ -108,7 +131,8 @@ var keyUpHandler = function keyUpHandler(e) {
   }
   // A OR LEFT
   else if (keyPressed === 65 || keyPressed === 37) {
-      player.turnLeft = false;
+      player.turningLeft = false;
+      socket.emit('turning', player);
     }
     // S OR DOWN
     else if (keyPressed === 83 || keyPressed === 40) {
@@ -116,7 +140,8 @@ var keyUpHandler = function keyUpHandler(e) {
       }
       // D OR RIGHT
       else if (keyPressed === 68 || keyPressed === 39) {
-          player.turnRight = false;
+          player.turningRight = false;
+          socket.emit('turning', player);
         }
         // SPACE
         else if (keyPressed === 32) {
@@ -176,8 +201,6 @@ var syncBullets = function syncBullets(data) {
 };
 
 var syncPlayers = function syncPlayers(data) {
-  console.log('syncing players');
-  console.dir(data);
   players = data;
 };
 

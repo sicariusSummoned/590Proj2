@@ -13,29 +13,38 @@ const onThrottleUp = (sock) => {
   const socket = sock;
 
   socket.on('throttleUp', (data) => {
-    console.log('throttling up');
     let tempPlayer = utility.getPlayer(data);
-    tempPlayer.speed++;
-    utility.setPlayer(tempPlayer);
+    if (tempPlayer.speed < 1) {
+      tempPlayer.speed++;
+      utility.setPlayer(tempPlayer);
+      console.log(`Speed:${tempPlayer.speed}`);
+    }
+    sendPlayers();
   });
 };
 
 const onThrottleDown = (sock) => {
   const socket = sock;
 
-  socket.on('throttleDown', (data) => {
-    console.log('throttling down');
+  socket.on('throttleDown', (data) => {;
+
+
     let tempPlayer = utility.getPlayer(data);
-    tempPlayer.speed--;
-    utility.setPlayer(tempPlayer);
+    if (tempPlayer.speed > -1) {
+      tempPlayer.speed--;
+      utility.setPlayer(tempPlayer);
+      console.log(`Speed:${tempPlayer.speed}`);
+
+    }
+    sendPlayers();
   });
 };
 
-const sendPlayers = () =>{
+const sendPlayers = () => {
   io.sockets.in('room1').emit('syncPlayers', utility.getPlayers());
 };
 
-const sendBullets = () =>{
+const sendBullets = () => {
   io.sockets.in('room1').emit('syncBullets', utility.getBullets());
 };
 
@@ -49,6 +58,8 @@ const onDisconnect = (sock) => {
     utility.removePlayer(socket.hash);
     //Decrement number of players online
     numOnline--;
+    sendPlayers();
+    socket.leave();
   })
 };
 
@@ -62,15 +73,6 @@ const serverUpdate = () => {
 
   for (let i = 0; i < keys.length; i++) {
     let player = players[keys[i]];
-
-    if (player.turningLeft) {
-      player.hullRotation -= 1;
-    } else if (player.turningRight) {
-      player.hullRotation += 1;
-    }
-
-    player.fX = Math.cos(player.hullRotation);
-    player.fY = Math.sin(player.hullRotation);
 
     player.x += player.speed * player.fX;
     player.y += player.speed * player.fY;
@@ -86,12 +88,33 @@ const serverUpdate = () => {
 
     utility.setBullet(bullet);
   }
-  
-  sendPlayers();
-  sendBullets();
 };
 
+const onReceiveTurning = (sock) => {
+  const socket = sock;
 
+  socket.on('turning', (data) => {
+    console.log('turning on server');
+    let player = data;
+
+    if (player.turningLeft) {
+      player.hullRotation -= 20;
+    }
+
+    if (player.turningRight) {
+      player.hullRotation += 20;
+    }
+
+    utility.setPlayer(player);
+
+    console.dir(player.hullRotation);
+    let asRad = player.hullRotation * 0.01745329252;
+
+    player.fX = Math.cos(asRad);
+    player.fY = Math.sin(asRad);
+
+  });
+}
 
 const onReceiveUpdate = (sock) => {
   const socket = sock;
@@ -99,12 +122,14 @@ const onReceiveUpdate = (sock) => {
   socket.on('playerUpdate', (data) => {
     if (data != null && data != undefined) {
       utility.setPlayer(data);
+
+      sendPlayers();
     }
   });
 }
 
 const configure = (ioServer) => {
-  let io = ioServer;
+  io = ioServer;
 
   io.on('connection', (socket) => {
     console.log('connection started');
@@ -118,9 +143,8 @@ const configure = (ioServer) => {
     //fY = sin(theta)
 
     let Player = {
-      x: 250,
-      y: 250,
-      rotation: 0,
+      x: 0,
+      y: 0,
       fX: 1,
       fY: 0,
       speed: 0,
@@ -136,7 +160,7 @@ const configure = (ioServer) => {
     //Increment number of players online
     numOnline++;
     //send this back to the client
-    socket.emit('playerCreated', utility.getPlayer(Player.hash));
+    io.sockets.in('room1').emit('playerCreated', utility.getPlayer(Player.hash));
     //If the number of active players is 
     //greater than two let the game begin
     if (numOnline > 2) {
@@ -150,9 +174,10 @@ const configure = (ioServer) => {
     onThrottleDown(socket);
     onThrottleUp(socket);
     onReceiveUpdate(socket);
-
+    onReceiveTurning(socket);
     if (!runOnce) {
       setInterval(serverUpdate, 30);
+      setInterval(sendPlayers, 30);
       runOnce = true;
     }
 

@@ -21,8 +21,6 @@ const syncBullets = (data) => {
 };
 
 const syncPlayers = (data) => {
-  console.log('syncing players');
-  console.dir(data);
   players = data;
 };
 

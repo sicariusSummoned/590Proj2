@@ -20,11 +20,18 @@ const keyDownHandler = (e) => {
 
   // A OR LEFT
   if (keyPressed === 65 || keyPressed === 37) {
-    player.turnLeft = true;
+    console.log('turning left');
+    player.turningLeft = true;
+    player.turningRight = false;
+    socket.emit('turning', player);
   }
   // D OR RIGHT
   else if (keyPressed === 68 || keyPressed === 39) {
-    player.turnRight = true;
+    player.turningRight = true;
+    player.turningLeft = false;
+    console.log('turning right');
+    socket.emit('turning', player);
+
   }
 };
 
@@ -38,15 +45,20 @@ const keyUpHandler = (e) => {
   }
   // A OR LEFT
   else if (keyPressed === 65 || keyPressed === 37) {
-    player.turnLeft = false;
+    player.turningLeft = false;
+    socket.emit('turning', player);
+
   }
   // S OR DOWN
   else if (keyPressed === 83 || keyPressed === 40) {
     socket.emit('throttleDown', player.hash);
+
   }
   // D OR RIGHT
   else if (keyPressed === 68 || keyPressed === 39) {
-    player.turnRight = false;
+    player.turningRight = false;
+    socket.emit('turning', player);
+
   }
   // SPACE
   else if (keyPressed === 32) {
