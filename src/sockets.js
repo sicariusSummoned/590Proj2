@@ -88,6 +88,8 @@ const serverUpdate = () => {
 
     utility.setBullet(bullet);
   }
+  
+  sendPlayers();
 };
 
 const onReceiveTurning = (sock) => {
@@ -177,7 +179,6 @@ const configure = (ioServer) => {
     onReceiveTurning(socket);
     if (!runOnce) {
       setInterval(serverUpdate, 30);
-      setInterval(sendPlayers, 30);
       runOnce = true;
     }
 
