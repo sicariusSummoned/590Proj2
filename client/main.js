@@ -104,16 +104,20 @@ const init = () => {
   document.body.addEventListener('keydown', keyDownHandler);
   document.body.addEventListener('keyup', keyUpHandler);
   window.addEventListener('mousemove', function (evt) {
-    mousePosition = getMousePosition(canvas, evt);
-    let player = players[hash];
-    player.turretRotation = angleDegBetweenPoints(player.x, player.y, mousePosition.x, mousePosition.y);
 
-    let packet = {
-      turretRotation: player.turretRotation,
-      hash: player.hash
-    };
-    
-    socket.emit('turretUpdate', packet);
+    if (players[hash]) {
+      mousePosition = getMousePosition(canvas, evt);
+      let player = players[hash];
+      player.turretRotation = angleDegBetweenPoints(player.x, player.y, mousePosition.x, mousePosition.y);
+
+      let packet = {
+        turretRotation: player.turretRotation,
+        hash: player.hash
+      };
+
+      socket.emit('turretUpdate', packet);
+    }
+
   }, false);
 
 

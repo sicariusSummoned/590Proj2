@@ -179,16 +179,19 @@ var init = function init() {
   document.body.addEventListener('keydown', keyDownHandler);
   document.body.addEventListener('keyup', keyUpHandler);
   window.addEventListener('mousemove', function (evt) {
-    mousePosition = getMousePosition(canvas, evt);
-    var player = players[hash];
-    player.turretRotation = angleDegBetweenPoints(player.x, player.y, mousePosition.x, mousePosition.y);
 
-    var packet = {
-      turretRotation: player.turretRotation,
-      hash: player.hash
-    };
+    if (players[hash]) {
+      mousePosition = getMousePosition(canvas, evt);
+      var player = players[hash];
+      player.turretRotation = angleDegBetweenPoints(player.x, player.y, mousePosition.x, mousePosition.y);
 
-    socket.emit('turretUpdate', packet);
+      var packet = {
+        turretRotation: player.turretRotation,
+        hash: player.hash
+      };
+
+      socket.emit('turretUpdate', packet);
+    }
   }, false);
 };
 
