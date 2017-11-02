@@ -22,21 +22,33 @@ const syncBullets = (data) => {
 };
 
 const syncPlayers = (data) => {
+  const keys = Object.keys(data);
 
-  if (!players[data.hash]) {
-    players[data.hash] = data;
-    return;
+  for (let i = 0; i < keys.length; i++) {
+    let dataPlayer = data[keys[i]];
+
+    if (!players[dataPlayer.hash]) {
+      players[dataPlayer.hash] = dataPlayer;
+      return;
+    }
+
+
+
+    let player = players[dataPlayer.hash];
+    player.x = dataPlayer.x;
+    player.y = dataPlayer.y;
+    player.fX = dataPlayer.fX;
+    player.fY = dataPlayer.fY;
+    player.speed = dataPlayer.speed;
+    player.hullRotation = dataPlayer.hullRotation;
+
+    console.dir(player.hullRotation);
+    player.turretRotation = dataPlayer.turretRotation;
   }
 
 
-  const player = players[data.hash];
-  player.x = data.x;
-  player.y = data.y;
-  player.fX = data.fX;
-  player.fY = data.fY;
-  player.speed = data.speed;
-  player.hullRotation = data.hullRotation;
-  player.turretRotation = data.turretRotation;
+
+
 };
 
 const setPlayer = (data) => {

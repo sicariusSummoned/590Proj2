@@ -40,15 +40,26 @@ const keyDownHandler = (e) => {
     console.log('turning left');
     player.turningLeft = true;
     player.turningRight = false;
-    socket.emit('turning', player.hash);
+    const packet = {
+      turningLeft: player.turningLeft,
+      turningRight: player.turningRight,
+      hash: player.hash
+    };
+
+    socket.emit('turning', packet);
   }
   // D OR RIGHT
   else if (keyPressed === 68 || keyPressed === 39) {
     player.turningRight = true;
     player.turningLeft = false;
     console.log('turning right');
-    socket.emit('turning', player.hash);
+    const packet = {
+      turningLeft: player.turningLeft,
+      turningRight: player.turningRight,
+      hash: player.hash
+    };
 
+    socket.emit('turning', packet);
   }
 };
 
@@ -63,7 +74,8 @@ const keyUpHandler = (e) => {
   // A OR LEFT
   else if (keyPressed === 65 || keyPressed === 37) {
     player.turningLeft = false;
-    socket.emit('turning', player.hash);
+
+
 
   }
   // S OR DOWN
@@ -74,7 +86,7 @@ const keyUpHandler = (e) => {
   // D OR RIGHT
   else if (keyPressed === 68 || keyPressed === 39) {
     player.turningRight = false;
-    socket.emit('turning', player.hash);
+
 
   }
   // SPACE

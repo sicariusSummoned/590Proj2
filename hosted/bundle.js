@@ -120,14 +120,26 @@ var keyDownHandler = function keyDownHandler(e) {
     console.log('turning left');
     player.turningLeft = true;
     player.turningRight = false;
-    socket.emit('turning', player.hash);
+    var packet = {
+      turningLeft: player.turningLeft,
+      turningRight: player.turningRight,
+      hash: player.hash
+    };
+
+    socket.emit('turning', packet);
   }
   // D OR RIGHT
   else if (keyPressed === 68 || keyPressed === 39) {
       player.turningRight = true;
       player.turningLeft = false;
       console.log('turning right');
-      socket.emit('turning', player.hash);
+      var _packet = {
+        turningLeft: player.turningLeft,
+        turningRight: player.turningRight,
+        hash: player.hash
+      };
+
+      socket.emit('turning', _packet);
     }
 };
 
@@ -142,7 +154,6 @@ var keyUpHandler = function keyUpHandler(e) {
   // A OR LEFT
   else if (keyPressed === 65 || keyPressed === 37) {
       player.turningLeft = false;
-      socket.emit('turning', player.hash);
     }
     // S OR DOWN
     else if (keyPressed === 83 || keyPressed === 40) {
@@ -151,7 +162,6 @@ var keyUpHandler = function keyUpHandler(e) {
       // D OR RIGHT
       else if (keyPressed === 68 || keyPressed === 39) {
           player.turningRight = false;
-          socket.emit('turning', player.hash);
         }
         // SPACE
         else if (keyPressed === 32) {
@@ -220,20 +230,27 @@ var syncBullets = function syncBullets(data) {
 };
 
 var syncPlayers = function syncPlayers(data) {
+  var keys = Object.keys(data);
 
-  if (!players[data.hash]) {
-    players[data.hash] = data;
-    return;
+  for (var i = 0; i < keys.length; i++) {
+    var dataPlayer = data[keys[i]];
+
+    if (!players[dataPlayer.hash]) {
+      players[dataPlayer.hash] = dataPlayer;
+      return;
+    }
+
+    var player = players[dataPlayer.hash];
+    player.x = dataPlayer.x;
+    player.y = dataPlayer.y;
+    player.fX = dataPlayer.fX;
+    player.fY = dataPlayer.fY;
+    player.speed = dataPlayer.speed;
+    player.hullRotation = dataPlayer.hullRotation;
+
+    console.dir(player.hullRotation);
+    player.turretRotation = dataPlayer.turretRotation;
   }
-
-  var player = players[data.hash];
-  player.x = data.x;
-  player.y = data.y;
-  player.fX = data.fX;
-  player.fY = data.fY;
-  player.speed = data.speed;
-  player.hullRotation = data.hullRotation;
-  player.turretRotation = data.turretRotation;
 };
 
 var setPlayer = function setPlayer(data) {

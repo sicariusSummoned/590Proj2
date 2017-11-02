@@ -95,17 +95,18 @@ const onReceiveTurning = (sock) => {
   const socket = sock;
 
   socket.on('turning', (data) => {
-    const player = utility.getPlayer(data);
-
-    if (player.turningLeft) {
+    console.dir(data);
+    const player = utility.getPlayer(data.hash);
+    console.dir(player);
+    if (data.turningLeft) {
       player.hullRotation -= 10;
     }
 
-    if (player.turningRight) {
+    if (data.turningRight) {
       player.hullRotation += 10;
     }
 
-
+    console.log(`server hullRot:${player.hullRotation}`);
     const asRad = player.hullRotation * (Math.PI / 180);
 
     player.fX = Math.cos(asRad);
@@ -119,7 +120,6 @@ const onTurretUpdate = (sock) => {
   const socket = sock;
 
   socket.on('turretUpdate', (data) => {
-    console.log('turretUPDATE');
 
     const player = utility.getPlayer(data.hash);
     player.turretRotation = data.turretRotation;
