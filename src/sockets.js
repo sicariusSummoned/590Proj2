@@ -13,23 +13,24 @@ const sendPlayers = () => {
   io.sockets.in('room1').emit('syncPlayers', utility.getPlayers());
 };
 
-/**
 const sendBullets = () => {
   io.sockets.in('room1').emit('syncBullets', utility.getBullets());
 };
-* */
 
 const onThrottleUp = (sock) => {
   const socket = sock;
 
   socket.on('throttleUp', (data) => {
     const tempPlayer = utility.getPlayer(data);
-    if (tempPlayer.speed < 1) {
-      tempPlayer.speed++;
-      utility.setPlayer(tempPlayer);
-      console.log(`Speed:${tempPlayer.speed}`);
+    if (tempPlayer != null || tempPlayer != undefined) {
+      if (tempPlayer.speed < 2) {
+        tempPlayer.speed++;
+        utility.setPlayer(tempPlayer);
+        console.log(`Speed:${tempPlayer.speed}`);
+      }
+      sendPlayers();
     }
-    sendPlayers();
+
   });
 };
 
@@ -47,6 +48,32 @@ const onThrottleDown = (sock) => {
   });
 };
 
+const onCannonFire = (sock) => {
+  const socket = sock;
+
+  socket.on('firingCannon', (data) => {
+    console.log('firingCannon serverside');
+
+    const tempPlayer = utility.getPlayer(data.hash);
+    if (tempPlayer != null && tempPlayer != undefined) {
+      const asRad = data.turretRotation * (Math.PI / 180);
+
+      let newBullet = {
+        rotation: tempPlayer.turretRotation,
+        x: tempPlayer.x,
+        y: tempPlayer.y,
+        fX: Math.cos(asRad),
+        fY: Math.sin(asRad),
+        hash: data.hash,
+        collided: false,
+        speed: 5,
+      };
+
+      utility.setBullet(newBullet);
+    }
+
+  });
+}
 
 const onDisconnect = (sock) => {
   const socket = sock;
@@ -56,7 +83,6 @@ const onDisconnect = (sock) => {
 
     // remove user data from users
     utility.removePlayer(socket.hash);
-    console.dir(utility.getPlayers());
     // Decrement number of players online
     numOnline--;
     socket.leave();
@@ -75,29 +101,43 @@ const serverUpdate = () => {
   for (let i = 0; i < keys.length; i++) {
     const player = players[keys[i]];
 
-    player.x += player.speed * player.fX;
-    player.y += player.speed * player.fY;
+    if (player != null && player != undefined) {
+      player.x += player.speed * player.fX;
+      player.y += player.speed * player.fY;
 
-    utility.setPlayer(player);
+      utility.setPlayer(player);
+    }
+
   }
+
+  utility.cullBullets(utility.getBullets());
 
   for (let i = 0; i < bulletKeys; i++) {
+
     const bullet = bullets[bulletKeys[i]];
 
-    bullet.x += bullet.speed * bullet.fX;
-    bullet.y += bullet.speed * bullet.fY;
+    if (bullet != null && bullet != undefined) {
 
-    utility.setBullet(bullet);
+
+      bullet.x += bullet.speed * bullet.fX;
+      bullet.y += bullet.speed * bullet.fY;
+
+      utility.setBullet(bullet);
+
+      console.log(`X:${bullet.x}`);
+      console.log(`Y:${bullet.y}`);
+    }
   }
+
+  io.in('room1').emit('sentExplosions', utility.checkBulletCollisions());
+
 };
 
 const onReceiveTurning = (sock) => {
   const socket = sock;
 
   socket.on('turning', (data) => {
-    console.dir(data);
     const player = utility.getPlayer(data.hash);
-    console.dir(player);
     if (data.turningLeft) {
       player.hullRotation -= 10;
     }
@@ -106,7 +146,6 @@ const onReceiveTurning = (sock) => {
       player.hullRotation += 10;
     }
 
-    console.log(`server hullRot:${player.hullRotation}`);
     const asRad = player.hullRotation * (Math.PI / 180);
 
     player.fX = Math.cos(asRad);
@@ -122,9 +161,12 @@ const onTurretUpdate = (sock) => {
   socket.on('turretUpdate', (data) => {
 
     const player = utility.getPlayer(data.hash);
-    player.turretRotation = data.turretRotation;
+    if (player != null && player != undefined) {
+      player.turretRotation = data.turretRotation;
 
-    utility.setPlayer(player);
+      utility.setPlayer(player);
+    }
+
   });
 };
 
@@ -176,15 +218,16 @@ const configure = (ioServer) => {
     onThrottleUp(socket);
     onTurretUpdate(socket);
     onReceiveTurning(socket);
+    onCannonFire(socket);
 
 
     if (runOnce === false) {
       setInterval(serverUpdate, 30);
       setInterval(sendPlayers, 30);
+      setInterval(sendBullets, 30);
       runOnce = true;
     }
 
-    console.dir(utility.getPlayers());
   });
 };
 

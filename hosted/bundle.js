@@ -18,6 +18,11 @@ var bulletSize = {
   HEIGHT: 20
 };
 
+var explosionSize = {
+  WIDTH: 200,
+  HEIGHT: 200
+};
+
 var redraw = function redraw(time) {
   update();
 
@@ -27,6 +32,7 @@ var redraw = function redraw(time) {
 
   var playerKeys = Object.keys(players);
   var bulletKeys = Object.keys(bullets);
+  var explosionKeys = Object.keys(explosions);
 
   for (var i = 0; i < playerKeys.length; i++) {
     var player = players[playerKeys[i]];
@@ -51,7 +57,7 @@ var redraw = function redraw(time) {
 
     ctx.translate(player.x, player.y);
     ctx.rotate(player.hullRotation * (Math.PI / 180));
-    ctx.drawImage(tankHullImg, 0, 0, hullSize.WIDTH, hullSize.HEIGHT, -25, -27, 50, 54);
+    ctx.drawImage(tankHullImg, 0, hullSize.HEIGHT * player.frame, hullSize.WIDTH, hullSize.HEIGHT, -25, -27, 50, 54);
 
     ctx.restore();
 
@@ -74,8 +80,23 @@ var redraw = function redraw(time) {
       ctx.filter = "hue-Rotate(90deg)";
     }
 
-    ctx.drawImage(bulletImg, bulletSize.WIDTH, bulletSize.HEIGHT, bulletSize.WIDTH, bulletSize.HEIGHT, bullet.x, bullet.y, bulletSize.WIDTH, bulletSize.HEIGHT);
+    ctx.save();
+
+    console.log("X:" + bullet.x);
+    console.log("Y:" + bullet.y);
+
+    ctx.translate(bullet.x, bullet.y);
+    ctx.rotate(bullet.rotation * (Math.PI / 180));
+    ctx.drawImage(bulletImg, 0, 0, bulletSize.WIDTH, bulletSize.HEIGHT, -bulletSize.WIDTH / 2, -bulletSize.HEIGHT / 2, bulletSize.WIDTH, bulletSize.HEIGHT);
+    ctx.restore();
   }
+
+  for (var _i2 = 0; _i2 < explosionKeys.length; _i2++) {
+    var explosion = explosions[explosionKeys[_i2]];
+
+    ctx.drawImage(explosionImg, 0, 0, explosionSize.WIDTH, explosionSize.HEIGHT, explosion.x, explosion.y, explosionSize.WIDTH, explosionSize.HEIGHT);
+  }
+
   animationFrame = requestAnimationFrame(redraw);
 };
 'use strict';
@@ -85,6 +106,7 @@ var ctx = void 0;
 var tankHullImg = void 0;
 var tankTurretImg = void 0;
 var bulletImg = void 0;
+var explosionImg = void 0;
 var bgImg = void 0;
 
 var socket = void 0;
@@ -93,6 +115,8 @@ var animationFrame = void 0;
 
 var players = {};
 var bullets = {};
+var explosions = {};
+
 var mousePosition = {
   x: 0,
   y: 0
@@ -163,17 +187,13 @@ var keyUpHandler = function keyUpHandler(e) {
       else if (keyPressed === 68 || keyPressed === 39) {
           player.turningRight = false;
         }
-        // SPACE
-        else if (keyPressed === 32) {
-
-            //Fire cannon
-          }
 };
 
 var init = function init() {
   tankHullImg = document.querySelector('#hull');
   tankTurretImg = document.querySelector('#turret');
   bulletImg = document.querySelector('#bullet');
+  explosionImg = document.querySelector('#explosion');
   bgImg = document.querySelector('#bg');
 
   canvas = document.querySelector('#canvas');
@@ -184,6 +204,7 @@ var init = function init() {
   socket.on('playerCreated', setPlayer);
   socket.on('syncPlayers', syncPlayers);
   socket.on('syncBullets', syncBullets);
+  socket.on('sentExplosions', receiveExplosions);
 
   document.body.addEventListener('keydown', keyDownHandler);
   document.body.addEventListener('keyup', keyUpHandler);
@@ -202,6 +223,8 @@ var init = function init() {
       socket.emit('turretUpdate', packet);
     }
   }, false);
+
+  window.addEventListener('click', fireCannon);
 };
 
 window.onload = init;
@@ -220,13 +243,65 @@ var updateBullets = function updateBullets() {
   var keys = Object.keys(bullets);
   for (var i = 0; i < keys.length; i++) {
     var bullet = bullets[keys[i]];
-    bullet.x += bullet.speed * bullet.fX;
-    bullet.y += bullet.speed * bullet.fY;
+    if (bullet.x < 0 || bullet.x > 600 || bullet.y < 0 || bullet.y > 600 || bullet.collided === false) {
+      bullet.x += bullet.speed * bullet.fX;
+      bullet.y += bullet.speed * bullet.fY;
+    }
+  }
+};
+
+var updateExplosions = function updateExplosions() {
+  var keys = Object.keys(explosions);
+
+  for (var i = 0; i < keys.length; i++) {
+    var explosion = explosions[keys[i]];
+    if (explosion.lifeFrames > 0) {
+      explosion.lifeFrames--;
+    } else {
+      delete explosions[keys[i]];
+    }
   }
 };
 
 var syncBullets = function syncBullets(data) {
-  //bullets = data;
+  var keys = Object.keys(data);
+
+  for (var i = 0; i < keys.length; i++) {
+    var dataBullet = data[keys[i]];
+
+    if (!bullets[dataBullet.hash]) {
+      bullets[dataBullet.hash] = dataBullet;
+      return;
+    }
+
+    var bullet = bullets[dataBullet.hash];
+    bullet.x = dataBullet.x;
+    bullet.y = dataBullet.y;
+    bullet.fX = dataBullet.fX;
+    bullet.fY = dataBullet.fY;
+    bullet.speed = dataBullet.speed;
+  }
+};
+
+var receiveExplosions = function receiveExplosions(data) {
+  explosions = data;
+};
+
+var fireCannon = function fireCannon() {
+  console.log('cannon fired clientside');
+
+  var packet = {
+    hash: hash,
+    turretRotation: players[hash].turretRotation
+  };
+
+  console.dir(packet);
+
+  if (!bullets[hash]) {
+    socket.emit('firingCannon', packet);
+  } else {
+    console.log('bullet still in the air');
+  }
 };
 
 var syncPlayers = function syncPlayers(data) {
@@ -247,8 +322,6 @@ var syncPlayers = function syncPlayers(data) {
     player.fY = dataPlayer.fY;
     player.speed = dataPlayer.speed;
     player.hullRotation = dataPlayer.hullRotation;
-
-    console.dir(player.hullRotation);
     player.turretRotation = dataPlayer.turretRotation;
   }
 };
@@ -264,4 +337,6 @@ var setPlayer = function setPlayer(data) {
 
 var update = function update() {
   updatePlayers();
+  updateBullets();
+  updateExplosions();
 };

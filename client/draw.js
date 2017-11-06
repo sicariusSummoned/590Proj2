@@ -16,6 +16,11 @@ const bulletSize = {
   HEIGHT: 20
 };
 
+const explosionSize = {
+  WIDTH: 200,
+  HEIGHT: 200
+};
+
 const redraw = (time) => {
   update();
 
@@ -25,6 +30,7 @@ const redraw = (time) => {
 
   const playerKeys = Object.keys(players);
   const bulletKeys = Object.keys(bullets);
+  const explosionKeys = Object.keys(explosions);
 
   for (let i = 0; i < playerKeys.length; i++) {
     const player = players[playerKeys[i]];
@@ -43,8 +49,6 @@ const redraw = (time) => {
           player.frame = 0;
         }
       }
-
-
     }
 
     ctx.save();
@@ -55,9 +59,11 @@ const redraw = (time) => {
     ctx.drawImage(
       tankHullImg,
       0,
-      0,
+      hullSize.HEIGHT * player.frame,
       hullSize.WIDTH,
-      hullSize.HEIGHT, -25, -27,
+      hullSize.HEIGHT,
+      -25,
+      -27,
       50,
       54,
     );
@@ -73,7 +79,8 @@ const redraw = (time) => {
       0,
       0,
       turretSize.WIDTH,
-      turretSize.HEIGHT, -7, //add half of hull width
+      turretSize.HEIGHT,
+      -7, //add half of hull width
       -10, //add half of hull height
       30,
       20,
@@ -95,17 +102,42 @@ const redraw = (time) => {
       ctx.filter = "hue-Rotate(90deg)";
     }
 
+    ctx.save();
+    
+    console.log(`X:${bullet.x}`);
+    console.log(`Y:${bullet.y}`);
+    
+    ctx.translate(bullet.x,bullet.y);
+    ctx.rotate(bullet.rotation * (Math.PI/180));
     ctx.drawImage(
       bulletImg,
+      0,
+      0,
       bulletSize.WIDTH,
       bulletSize.HEIGHT,
-      bulletSize.WIDTH,
-      bulletSize.HEIGHT,
-      bullet.x,
-      bullet.y,
+      -bulletSize.WIDTH/2,
+      -bulletSize.HEIGHT/2,
       bulletSize.WIDTH,
       bulletSize.HEIGHT
     );
+    ctx.restore();
   }
+
+  for (let i = 0; i < explosionKeys.length; i++) {
+    const explosion = explosions[explosionKeys[i]];
+
+    ctx.drawImage(
+      explosionImg,
+      0,
+      0,
+      explosionSize.WIDTH,
+      explosionSize.HEIGHT,
+      explosion.x,
+      explosion.y,
+      explosionSize.WIDTH,
+      explosionSize.HEIGHT
+    );
+  }
+
   animationFrame = requestAnimationFrame(redraw);
 };

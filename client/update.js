@@ -12,14 +12,66 @@ const updateBullets = () => {
   let keys = Object.keys(bullets);
   for (let i = 0; i < keys.length; i++) {
     let bullet = bullets[keys[i]];
-    bullet.x += bullet.speed * bullet.fX;
-    bullet.y += bullet.speed * bullet.fY;
+    if (bullet.x < 0 || bullet.x > 600 || bullet.y < 0 || bullet.y > 600 || bullet.collided === false) {
+      bullet.x += bullet.speed * bullet.fX;
+      bullet.y += bullet.speed * bullet.fY;
+    }
   }
 };
 
+const updateExplosions = () => {
+  let keys = Object.keys(explosions);
+
+  for (let i = 0; i < keys.length; i++) {
+    let explosion = explosions[keys[i]];
+    if (explosion.lifeFrames > 0) {
+      explosion.lifeFrames--;
+    } else {
+      delete explosions[keys[i]];
+    }
+  }
+}
+
 const syncBullets = (data) => {
-  //bullets = data;
+  const keys = Object.keys(data);
+
+  for (let i = 0; i < keys.length; i++) {
+    let dataBullet = data[keys[i]];
+
+    if (!bullets[dataBullet.hash]) {
+      bullets[dataBullet.hash] = dataBullet;
+      return;
+    }
+
+    let bullet = bullets[dataBullet.hash];
+    bullet.x = dataBullet.x;
+    bullet.y = dataBullet.y;
+    bullet.fX = dataBullet.fX;
+    bullet.fY = dataBullet.fY;
+    bullet.speed = dataBullet.speed;
+  }
 };
+
+const receiveExplosions = (data) => {
+  explosions = data;
+}
+
+const fireCannon = () => {
+  console.log('cannon fired clientside');
+
+  let packet = {
+    hash: hash,
+    turretRotation: players[hash].turretRotation
+  };
+
+  console.dir(packet);
+
+  if (!bullets[hash]) {
+    socket.emit('firingCannon', packet);
+  } else {
+    console.log('bullet still in the air');
+  }
+}
 
 const syncPlayers = (data) => {
   const keys = Object.keys(data);
@@ -32,8 +84,6 @@ const syncPlayers = (data) => {
       return;
     }
 
-
-
     let player = players[dataPlayer.hash];
     player.x = dataPlayer.x;
     player.y = dataPlayer.y;
@@ -41,8 +91,6 @@ const syncPlayers = (data) => {
     player.fY = dataPlayer.fY;
     player.speed = dataPlayer.speed;
     player.hullRotation = dataPlayer.hullRotation;
-
-    console.dir(player.hullRotation);
     player.turretRotation = dataPlayer.turretRotation;
   }
 
@@ -63,6 +111,8 @@ const setPlayer = (data) => {
 }
 
 const update = () => {
-  updatePlayers()
+  updatePlayers();
+  updateBullets();
+  updateExplosions();
 
 };

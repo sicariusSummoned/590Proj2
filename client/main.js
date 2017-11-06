@@ -3,6 +3,7 @@ let ctx;
 let tankHullImg;
 let tankTurretImg;
 let bulletImg;
+let explosionImg;
 let bgImg;
 
 let socket;
@@ -11,6 +12,8 @@ let animationFrame;
 
 let players = {};
 let bullets = {};
+let explosions = {};
+
 let mousePosition = {
   x: 0,
   y: 0
@@ -75,8 +78,6 @@ const keyUpHandler = (e) => {
   else if (keyPressed === 65 || keyPressed === 37) {
     player.turningLeft = false;
 
-
-
   }
   // S OR DOWN
   else if (keyPressed === 83 || keyPressed === 40) {
@@ -87,13 +88,8 @@ const keyUpHandler = (e) => {
   else if (keyPressed === 68 || keyPressed === 39) {
     player.turningRight = false;
 
-
   }
-  // SPACE
-  else if (keyPressed === 32) {
 
-    //Fire cannon
-  }
 
 };
 
@@ -101,6 +97,7 @@ const init = () => {
   tankHullImg = document.querySelector('#hull');
   tankTurretImg = document.querySelector('#turret');
   bulletImg = document.querySelector('#bullet');
+  explosionImg = document.querySelector('#explosion');
   bgImg = document.querySelector('#bg');
 
   canvas = document.querySelector('#canvas');
@@ -112,6 +109,7 @@ const init = () => {
   socket.on('playerCreated', setPlayer);
   socket.on('syncPlayers', syncPlayers);
   socket.on('syncBullets', syncBullets);
+  socket.on('sentExplosions', receiveExplosions);
 
   document.body.addEventListener('keydown', keyDownHandler);
   document.body.addEventListener('keyup', keyUpHandler);
@@ -131,9 +129,10 @@ const init = () => {
     }
 
   }, false);
-
-
-
+  
+  window.addEventListener('click', fireCannon);
+  
+  
 }
 
 window.onload = init;
