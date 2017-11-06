@@ -93,6 +93,8 @@ const redraw = (time) => {
 
   }
 
+  console.log(`#of bullets:${bulletKeys.length}`);
+  
   for (let i = 0; i < bulletKeys.length; i++) {
     const bullet = bullets[bulletKeys[i]];
 
@@ -132,8 +134,8 @@ const redraw = (time) => {
       0,
       explosionSize.WIDTH,
       explosionSize.HEIGHT,
-      explosion.x,
-      explosion.y,
+      -explosionSize.WIDTH/2,
+      -explosionSize.HEIGHT/2,
       explosionSize.WIDTH,
       explosionSize.HEIGHT
     );

@@ -71,6 +71,8 @@ var redraw = function redraw(time) {
     ctx.restore();
   }
 
+  console.log("#of bullets:" + bulletKeys.length);
+
   for (var _i = 0; _i < bulletKeys.length; _i++) {
     var bullet = bullets[bulletKeys[_i]];
 
@@ -230,7 +232,7 @@ var init = function init() {
 window.onload = init;
 'use strict';
 
-var updatePlayers = function updatePlayers() {
+var interpolatePlayers = function interpolatePlayers() {
   var keys = Object.keys(players);
   for (var i = 0; i < keys.length; i++) {
     var player = players[keys[i]];
@@ -239,7 +241,7 @@ var updatePlayers = function updatePlayers() {
   }
 };
 
-var updateBullets = function updateBullets() {
+var interpolateBullets = function interpolateBullets() {
   var keys = Object.keys(bullets);
   for (var i = 0; i < keys.length; i++) {
     var bullet = bullets[keys[i]];
@@ -265,6 +267,8 @@ var updateExplosions = function updateExplosions() {
 
 var syncBullets = function syncBullets(data) {
   var keys = Object.keys(data);
+
+  console.dir(data);
 
   for (var i = 0; i < keys.length; i++) {
     var dataBullet = data[keys[i]];
@@ -336,7 +340,7 @@ var setPlayer = function setPlayer(data) {
 };
 
 var update = function update() {
-  updatePlayers();
-  updateBullets();
+  //interpolatePlayers();
+  //interpolateBullets();
   updateExplosions();
 };

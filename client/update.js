@@ -1,4 +1,4 @@
-const updatePlayers = () => {
+const interpolatePlayers = () => {
   let keys = Object.keys(players);
   for (let i = 0; i < keys.length; i++) {
     let player = players[keys[i]];
@@ -8,7 +8,7 @@ const updatePlayers = () => {
 
 };
 
-const updateBullets = () => {
+const interpolateBullets = () => {
   let keys = Object.keys(bullets);
   for (let i = 0; i < keys.length; i++) {
     let bullet = bullets[keys[i]];
@@ -35,6 +35,11 @@ const updateExplosions = () => {
 const syncBullets = (data) => {
   const keys = Object.keys(data);
 
+  console.dir(data);
+  
+  bullets = data;
+  
+  /**
   for (let i = 0; i < keys.length; i++) {
     let dataBullet = data[keys[i]];
 
@@ -50,6 +55,8 @@ const syncBullets = (data) => {
     bullet.fY = dataBullet.fY;
     bullet.speed = dataBullet.speed;
   }
+  **/
+  
 };
 
 const receiveExplosions = (data) => {
@@ -111,8 +118,8 @@ const setPlayer = (data) => {
 }
 
 const update = () => {
-  updatePlayers();
-  updateBullets();
+  interpolatePlayers();
+  interpolateBullets();
   updateExplosions();
 
 };

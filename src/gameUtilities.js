@@ -62,7 +62,7 @@ const checkBulletCollisions = () => {
       const player = players[pKeys[i]];
       // Ignore your own bullets
 
-      if (player !== null || player !== undefined || bullet !== null || bullet !== undefined) {
+      if (player !== null && player !== undefined && bullet !== null && bullet !== undefined) {
         if (bullet.hash !== player.hash) {
           if (checkHit(bullet.x, bullet.y, 5, player.x, player.y, 25)) {
             bullet.collided = true;
@@ -92,13 +92,22 @@ const cullBullets = () => {
 
   for (let i = 0; i < bKeys.length; i++) {
     const bullet = bullets[bKeys[i]];
-    if (bullet.collided === true) {
+    if (bullet === null || bullet === undefined) {
+      return null;
+    }
+
+    if (bullet.collided === false) {
       if (bullet.x < 0 || bullet.x > 600 || bullet.y < 0 || bullet.y > 600) {
         console.log(`culling:${bullet}`);
         delete bullets[bullet.hash];
       }
+    } else {
+      console.log(`culling:${bullet}`);
+      delete bullets[bullet.hash];
     }
   }
+
+  return null;
 };
 
 

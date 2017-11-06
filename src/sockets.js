@@ -26,7 +26,7 @@ const onThrottleUp = (sock) => {
       if (tempPlayer.speed < 2) {
         tempPlayer.speed++;
         utility.setPlayer(tempPlayer);
-        console.log(`Speed:${tempPlayer.speed}`);
+        // console.log(`Speed:${tempPlayer.speed}`);
       }
       sendPlayers();
     }
@@ -41,7 +41,7 @@ const onThrottleDown = (sock) => {
     if (tempPlayer.speed > -1) {
       tempPlayer.speed--;
       utility.setPlayer(tempPlayer);
-      console.log(`Speed:${tempPlayer.speed}`);
+      // console.log(`Speed:${tempPlayer.speed}`);
     }
     sendPlayers();
   });
@@ -92,6 +92,7 @@ const serverUpdate = () => {
   const bullets = utility.getBullets();
   const bulletKeys = Object.keys(bullets);
 
+
   const players = utility.getPlayers();
   const keys = Object.keys(players);
 
@@ -107,11 +108,10 @@ const serverUpdate = () => {
     }
   }
 
-  utility.cullBullets(utility.getBullets());
 
-  for (let i = 0; i < bulletKeys; i++) {
+  for (let i = 0; i < bulletKeys.length; i++) {
     const bullet = bullets[bulletKeys[i]];
-
+    console.dir(bullet);
     if (bullet !== null && bullet !== undefined) {
       bullet.x += bullet.speed * bullet.fX;
       bullet.y += bullet.speed * bullet.fY;
@@ -120,8 +120,13 @@ const serverUpdate = () => {
 
       console.log(`X:${bullet.x}`);
       console.log(`Y:${bullet.y}`);
+    } else {
+      console.log('UNDEFINED OR NULL');
     }
   }
+
+  utility.cullBullets(utility.getBullets());
+
 
   io.in('room1').emit('sentExplosions', utility.checkBulletCollisions());
 };
