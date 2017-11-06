@@ -49,38 +49,36 @@ const checkHit = (x1, y1, r1, x2, y2, r2) => {
   return false;
 };
 
-//Calculate all bullet hits this frame
+// Calculate all bullet hits this frame
 const checkBulletCollisions = () => {
   const bKeys = Object.keys(bullets);
   const pKeys = Object.keys(players);
 
-  let collisions = {};
+  const collisions = {};
 
   for (let i = 0; i < bKeys.length; i++) {
     const bullet = bullets[bKeys[i]];
     for (let j = 0; j < pKeys.length; j++) {
       const player = players[pKeys[i]];
-      //Ignore your own bullets
+      // Ignore your own bullets
 
-      if (player != null || player != undefined || bullet != null || bullet != undefined) {
+      if (player !== null || player !== undefined || bullet !== null || bullet !== undefined) {
         if (bullet.hash !== player.hash) {
           if (checkHit(bullet.x, bullet.y, 5, player.x, player.y, 25)) {
             bullet.collided = true;
             console.log('Hit Detected');
-            let explosion = {
+            const explosion = {
               x: bullet.x,
               y: bullet.y,
-              lifeFrames: 10
+              lifeFrames: 10,
             };
-            
+
             setBullets(bullet);
-            
-            //populate list with all hits
+
+            // populate list with all hits
             collisions[explosion] = explosion;
           }
         }
-      }else{
-        
       }
     }
   }
@@ -93,10 +91,12 @@ const cullBullets = () => {
   const bKeys = Object.keys(bullets);
 
   for (let i = 0; i < bKeys.length; i++) {
-    let bullet = bullets[bKeys[i]];
-    if (bullet.collided == true || bullet.x < 0 || bullet.x > 600 || bullet.y < 0 || bullet.y > 600) {
-      console.log(`culling:${bullet}`);
-      delete bullets[bullet.hash];
+    const bullet = bullets[bKeys[i]];
+    if (bullet.collided === true) {
+      if (bullet.x < 0 || bullet.x > 600 || bullet.y < 0 || bullet.y > 600) {
+        console.log(`culling:${bullet}`);
+        delete bullets[bullet.hash];
+      }
     }
   }
 };

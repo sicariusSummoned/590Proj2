@@ -22,7 +22,7 @@ const onThrottleUp = (sock) => {
 
   socket.on('throttleUp', (data) => {
     const tempPlayer = utility.getPlayer(data);
-    if (tempPlayer != null || tempPlayer != undefined) {
+    if (tempPlayer !== null || tempPlayer !== undefined) {
       if (tempPlayer.speed < 2) {
         tempPlayer.speed++;
         utility.setPlayer(tempPlayer);
@@ -30,7 +30,6 @@ const onThrottleUp = (sock) => {
       }
       sendPlayers();
     }
-
   });
 };
 
@@ -55,10 +54,10 @@ const onCannonFire = (sock) => {
     console.log('firingCannon serverside');
 
     const tempPlayer = utility.getPlayer(data.hash);
-    if (tempPlayer != null && tempPlayer != undefined) {
+    if (tempPlayer !== null && tempPlayer !== undefined) {
       const asRad = data.turretRotation * (Math.PI / 180);
 
-      let newBullet = {
+      const newBullet = {
         rotation: tempPlayer.turretRotation,
         x: tempPlayer.x,
         y: tempPlayer.y,
@@ -71,9 +70,8 @@ const onCannonFire = (sock) => {
 
       utility.setBullet(newBullet);
     }
-
   });
-}
+};
 
 const onDisconnect = (sock) => {
   const socket = sock;
@@ -101,24 +99,20 @@ const serverUpdate = () => {
   for (let i = 0; i < keys.length; i++) {
     const player = players[keys[i]];
 
-    if (player != null && player != undefined) {
+    if (player !== null && player !== undefined) {
       player.x += player.speed * player.fX;
       player.y += player.speed * player.fY;
 
       utility.setPlayer(player);
     }
-
   }
 
   utility.cullBullets(utility.getBullets());
 
   for (let i = 0; i < bulletKeys; i++) {
-
     const bullet = bullets[bulletKeys[i]];
 
-    if (bullet != null && bullet != undefined) {
-
-
+    if (bullet !== null && bullet !== undefined) {
       bullet.x += bullet.speed * bullet.fX;
       bullet.y += bullet.speed * bullet.fY;
 
@@ -130,7 +124,6 @@ const serverUpdate = () => {
   }
 
   io.in('room1').emit('sentExplosions', utility.checkBulletCollisions());
-
 };
 
 const onReceiveTurning = (sock) => {
@@ -159,14 +152,12 @@ const onTurretUpdate = (sock) => {
   const socket = sock;
 
   socket.on('turretUpdate', (data) => {
-
     const player = utility.getPlayer(data.hash);
-    if (player != null && player != undefined) {
+    if (player !== null && player !== undefined) {
       player.turretRotation = data.turretRotation;
 
       utility.setPlayer(player);
     }
-
   });
 };
 
@@ -227,7 +218,6 @@ const configure = (ioServer) => {
       setInterval(sendBullets, 30);
       runOnce = true;
     }
-
   });
 };
 
