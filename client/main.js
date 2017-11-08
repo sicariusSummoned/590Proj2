@@ -6,9 +6,14 @@ let bulletImg;
 let explosionImg;
 let bgImg;
 
+let playerHealthDisplay;
+let playerSpeedDisplay;
+let playerShotDisplay;
+
 let socket;
 let hash;
 let animationFrame;
+
 
 let players = {};
 let bullets = {};
@@ -99,6 +104,11 @@ const init = () => {
   bulletImg = document.querySelector('#bullet');
   explosionImg = document.querySelector('#explosion');
   bgImg = document.querySelector('#bg');
+  
+  playerHealthDisplay = document.querySelector('#playerHealth');
+  playerSpeedDisplay = document.querySelector('#playerSpeed');
+  playerShotDisplay = document.querySelector('#shotReady');
+  
   
 
   canvas = document.querySelector('#canvas');

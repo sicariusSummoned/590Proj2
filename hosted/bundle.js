@@ -88,6 +88,8 @@ var redraw = function redraw(time) {
   }
 
   for (var _i2 = 0; _i2 < explosions.length; _i2++) {
+    ctx.filter = "none";
+
     var explosion = explosions[_i2];
 
     console.log('drawing explosion');
@@ -95,6 +97,19 @@ var redraw = function redraw(time) {
     ctx.drawImage(explosionImg, 0, 0, explosionSize.WIDTH, explosionSize.HEIGHT, explosion.x - explosionSize.WIDTH / 2, explosion.y - explosionSize.HEIGHT / 2, explosionSize.WIDTH, explosionSize.HEIGHT);
 
     explosion.lifeFrames--;
+  }
+
+  if (!players[hash] || players[hash].hp <= 0) {
+    ctx.save();
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, screenWidth, screenHeight);
+    ctx.restore();
+    ctx.fillStyle = 'white';
+    ctx.font = "30px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("YOU DIED", 300, 300);
+    ctx.font = "24px Arial";
+    ctx.fillText("Press F5 to Restart", 300, 350);
   }
 
   animationFrame = requestAnimationFrame(redraw);
@@ -108,6 +123,10 @@ var tankTurretImg = void 0;
 var bulletImg = void 0;
 var explosionImg = void 0;
 var bgImg = void 0;
+
+var playerHealthDisplay = void 0;
+var playerSpeedDisplay = void 0;
+var playerShotDisplay = void 0;
 
 var socket = void 0;
 var hash = void 0;
@@ -195,6 +214,10 @@ var init = function init() {
   bulletImg = document.querySelector('#bullet');
   explosionImg = document.querySelector('#explosion');
   bgImg = document.querySelector('#bg');
+
+  playerHealthDisplay = document.querySelector('#playerHealth');
+  playerSpeedDisplay = document.querySelector('#playerSpeed');
+  playerShotDisplay = document.querySelector('#shotReady');
 
   canvas = document.querySelector('#canvas');
   ctx = canvas.getContext('2d');
@@ -327,6 +350,46 @@ var syncPlayers = function syncPlayers(data) {
     player.turretRotation = dataPlayer.turretRotation;
   }
   **/
+
+  //Update Display on page
+
+  var percentHp = void 0;
+  var gearText = void 0;
+  var shotText = void 0;
+
+  percentHp = players[hash].hp / 10;
+  percentHp *= 100;
+
+  switch (players[hash].speed) {
+    case -1:
+      gearText = "R";
+      break;
+    case 0:
+      gearText = "N";
+      break;
+    case 1:
+      gearText = "1";
+      break;
+    case 2:
+      gearText = "2";
+      break;
+    case 3:
+      gearText = "3";
+      break;
+    default:
+      gearText = "???";
+      break;
+  }
+
+  if (!bullets[hash]) {
+    shotText = "READY       ";
+  } else {
+    shotText = "RELOADING...";
+  }
+
+  playerHealthDisplay.innerText = percentHp.toString();
+  playerSpeedDisplay.innerText = gearText;
+  playerShotDisplay.innerText = shotText;
 };
 
 var setPlayer = function setPlayer(data) {

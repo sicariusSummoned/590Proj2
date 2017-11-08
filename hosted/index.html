@@ -6,29 +6,101 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script src="/assets/bundle.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Black+Ops+One" rel="stylesheet">
 
   <style>
-    img{
-      display:none;
+    html,
+    body{
+      width:100%;
+      height:100%;
+      margin:0;
+      padding:0;
+      user-select: none;
+      font-family: 'Black Ops One', cursive;
+      color: white;
     }
-    canvas{
-      border: solid black 1px;
+    
+    #title{
+      font-size: 64pt;
+      width:500px;
+      margin:auto;
+      padding:0;
+      text-align: center;
     }
+    #subtitle{
+      font-size: 24pt;
+      width:900px;
+      margin:auto;
+      padding:0;
+      text-align: center;
+    }
+    
+    h3{
+      display:inline-block;
+      border:1px dashed yellow;
+      margin-left: 20px;
+      padding:20px;
+      
+    }
+    
+    html{
+      background-image: url(/assets/pageBG.jpg);
+      background-repeat: no-repeat;
+    }
+    
+    #display{
+      margin-top: 30px;
+      border: 1px solid black;
+      display: block;
+      margin-left:auto;
+      margin-right: auto;
+      user-select: none;
+      width:600px;
+      height:600px;
+    }
+    
+    #ui{
+      border:2px solid black;
+      background-image: url(/assets/diamondPlateBG.jpg);
+      background-repeat: no-repeat;
+      width: 800px;
+      margin:auto;
+      display: block;
+    
+    }
+
+    
+    img {
+      display: none;
+    }
+
   </style>
 </head>
 
 <body>
-  <div id="UI">
+
+  <h1 id="title">Tank Ace</h1>
+  <h2 id="subtitle">WASD to Move and Mouse to Shoot</h2>
+
+  <div id="ui">
+    <h3>HULL STATUS: <span id="playerHealth">100</span>%</h3>
+    <h3>GEAR: <span id="playerSpeed">N</span></h3>
+    <h3>WEAPON STATUS: <span id="shotReady">READY</span></h3>
   </div>
 
-  <div id="Display">
+
+  <div id="display">
     <canvas id="canvas" height="600" width="600">Please use a canvas compatible browser</canvas>
   </div>
+
+
+
+
   <img id="hull" src="/assets/Hull.png" alt="hullImage" />
-  <img id="turret" src="/assets/Turret.png" alt="turretImage"/>
-  <img id="bullet" src="/assets/bullet.png" alt="bulletImage"/>
-  <img id="explosion" src="/assets/explosion.png" alt="explosionImage"/>
-  <img id="bg" src="/assets/battlefield.jpg" alt="backgroundImage"/>
+  <img id="turret" src="/assets/Turret.png" alt="turretImage" />
+  <img id="bullet" src="/assets/bullet.png" alt="bulletImage" />
+  <img id="explosion" src="/assets/explosion.png" alt="explosionImage" />
+  <img id="bg" src="/assets/battlefield.jpg" alt="backgroundImage" />
 </body>
 
 

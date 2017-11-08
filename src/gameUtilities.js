@@ -65,19 +65,18 @@ const checkBulletCollisions = () => {
       if (player !== null && player !== undefined && bullet !== null && bullet !== undefined) {
         if (bullet.hash !== player.hash) {
           if (checkHit(bullet.x, bullet.y, 5, player.x, player.y, 25)) {
-            
-            
             bullet.collided = true;
-            
+            player.hp--;
+
             console.log('Hit Detected');
             const explosion = {
-              x: bullet.x,
-              y: bullet.y,
+              x: player.x,
+              y: player.y,
               lifeFrames: 20,
             };
 
             setBullet(bullet);
-
+            setPlayer(player);
             // populate list with all hits
             collisions.push(explosion);
           }
@@ -100,15 +99,29 @@ const cullBullets = () => {
 
     if (bullet.collided === false) {
       if (bullet.x < 0 || bullet.x > 600 || bullet.y < 0 || bullet.y > 600) {
-        //console.log(`culling:${bullet}`);
+        // console.log(`culling:${bullet}`);
         delete bullets[bullet.hash];
-      }else{
+      } else {
         return null;
       }
-    } else if(bullet.collided === true){
+    } else if (bullet.collided === true) {
       console.log('collided = true');
-      
+
       delete bullets[bullet.hash];
+    }
+  }
+
+  return null;
+};
+
+const cullPlayers = () => {
+  const pKeys = Object.keys(players);
+
+  for (let i = 0; i < pKeys.length; i++) {
+    const player = players[pKeys[i]];
+
+    if (player.hp <= 0) {
+      delete players[player.hash];
     }
   }
 
@@ -131,5 +144,6 @@ module.exports = {
   getPlayer,
   checkHit,
   cullBullets,
+  cullPlayers,
   checkBulletCollisions,
 };

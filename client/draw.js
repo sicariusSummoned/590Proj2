@@ -31,6 +31,7 @@ const redraw = (time) => {
   const playerKeys = Object.keys(players);
   const bulletKeys = Object.keys(bullets);
 
+
   for (let i = 0; i < playerKeys.length; i++) {
     const player = players[playerKeys[i]];
 
@@ -60,9 +61,7 @@ const redraw = (time) => {
       0,
       hullSize.HEIGHT * player.frame,
       hullSize.WIDTH,
-      hullSize.HEIGHT,
-      -25,
-      -27,
+      hullSize.HEIGHT, -25, -27,
       50,
       54,
     );
@@ -78,8 +77,7 @@ const redraw = (time) => {
       0,
       0,
       turretSize.WIDTH,
-      turretSize.HEIGHT,
-      -7, //add half of hull width
+      turretSize.HEIGHT, -7, //add half of hull width
       -10, //add half of hull height
       30,
       20,
@@ -92,7 +90,7 @@ const redraw = (time) => {
 
   }
 
-  
+
   for (let i = 0; i < bulletKeys.length; i++) {
     const bullet = bullets[bulletKeys[i]];
 
@@ -103,43 +101,57 @@ const redraw = (time) => {
     }
 
     ctx.save();
-    
-    
-    ctx.translate(bullet.x,bullet.y);
-    ctx.rotate(bullet.rotation * (Math.PI/180));
+
+
+    ctx.translate(bullet.x, bullet.y);
+    ctx.rotate(bullet.rotation * (Math.PI / 180));
     ctx.drawImage(
       bulletImg,
       0,
       0,
       bulletSize.WIDTH,
-      bulletSize.HEIGHT,
-      -bulletSize.WIDTH/4,
-      -bulletSize.HEIGHT/4,
-      bulletSize.WIDTH/2,
-      bulletSize.HEIGHT/2
+      bulletSize.HEIGHT, -bulletSize.WIDTH / 4, -bulletSize.HEIGHT / 4,
+      bulletSize.WIDTH / 2,
+      bulletSize.HEIGHT / 2
     );
     ctx.restore();
   }
 
-  
+
   for (let i = 0; i < explosions.length; i++) {
+    ctx.filter = "none";
+
     const explosion = explosions[i];
-    
+
     console.log('drawing explosion');
-    
+
     ctx.drawImage(
       explosionImg,
       0,
       0,
       explosionSize.WIDTH,
       explosionSize.HEIGHT,
-      explosion.x - explosionSize.WIDTH/2,
-      explosion.y - explosionSize.HEIGHT/2,
+      explosion.x - explosionSize.WIDTH / 2,
+      explosion.y - explosionSize.HEIGHT / 2,
       explosionSize.WIDTH,
       explosionSize.HEIGHT,
     );
-    
+
     explosion.lifeFrames--;
+  }
+
+
+  if (!players[hash] || players[hash].hp <= 0) {
+    ctx.save();
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, screenWidth, screenHeight);
+    ctx.restore();
+    ctx.fillStyle = 'white';
+    ctx.font = "30px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("YOU DIED", 300, 300);
+    ctx.font = "24px Arial";
+    ctx.fillText("Press F5 to Restart", 300, 350);
   }
 
   animationFrame = requestAnimationFrame(redraw);

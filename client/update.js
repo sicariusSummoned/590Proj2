@@ -20,22 +20,22 @@ const interpolateBullets = () => {
 };
 
 const cullExplosions = () => {
-  
+
   for (let i = 0; i < explosions.length; i++) {
     let explosion = explosions[i];
     if (explosion.lifeFrames < 0) {
-      explosions.splice(i,1);
+      explosions.splice(i, 1);
       console.log('cullingExplosion');
-    } 
+    }
   }
 };
 
 const syncBullets = (data) => {
   const keys = Object.keys(data);
 
-  
+
   bullets = data;
-  
+
   /**
   for (let i = 0; i < keys.length; i++) {
     let dataBullet = data[keys[i]];
@@ -53,7 +53,7 @@ const syncBullets = (data) => {
     bullet.speed = dataBullet.speed;
   }
   **/
-  
+
 };
 
 const receiveExplosions = (data) => {
@@ -82,7 +82,7 @@ const syncPlayers = (data) => {
   const keys = Object.keys(data);
 
   players = data;
-  
+
   /**
   for (let i = 0; i < keys.length; i++) {
     let dataPlayer = data[keys[i]];
@@ -103,7 +103,53 @@ const syncPlayers = (data) => {
   }
   **/
 
+  //Update Display on page
 
+  let percentHp;
+  let gearText;
+  let shotText;
+
+
+
+  percentHp = players[hash].hp / 10;
+  percentHp *= 100;
+
+
+  switch (players[hash].speed) {
+    case -1:
+      gearText = "R";
+      break;
+    case 0:
+      gearText = "N";
+      break;
+    case 1:
+      gearText = "1";
+      break;
+    case 2:
+      gearText = "2"
+      break;
+    case 3:
+      gearText = "3"
+      break;
+    default:
+      gearText = "???"
+      break;
+  }
+
+
+  if (!bullets[hash]) {
+    shotText = "READY       ";
+  } else {
+    shotText = "RELOADING...";
+  }
+
+
+
+
+
+  playerHealthDisplay.innerText = percentHp.toString();
+  playerSpeedDisplay.innerText = gearText;
+  playerShotDisplay.innerText = shotText;
 };
 
 const setPlayer = (data) => {

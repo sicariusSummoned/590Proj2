@@ -23,7 +23,7 @@ const onThrottleUp = (sock) => {
   socket.on('throttleUp', (data) => {
     const tempPlayer = utility.getPlayer(data);
     if (tempPlayer !== null || tempPlayer !== undefined) {
-      if (tempPlayer.speed < 2) {
+      if (tempPlayer.speed < 3) {
         tempPlayer.speed++;
         utility.setPlayer(tempPlayer);
         // console.log(`Speed:${tempPlayer.speed}`);
@@ -65,7 +65,7 @@ const onCannonFire = (sock) => {
         fY: Math.sin(asRad),
         hash: data.hash,
         collided: false,
-        speed: 5,
+        speed: 8,
       };
 
       utility.setBullet(newBullet);
@@ -101,27 +101,25 @@ const serverUpdate = () => {
     const player = players[keys[i]];
 
     if (player !== null && player !== undefined) {
-      
-      
       player.x += player.speed * player.fX;
       player.y += player.speed * player.fY;
 
-      if(player.x >600){
+      if (player.x > 600) {
         player.x = 1;
       }
-      
-      if(player.x <0){
+
+      if (player.x < 0) {
         player.x = 599;
       }
-      
-      if(player.y > 600){
+
+      if (player.y > 600) {
         player.y = 1;
       }
-      
-      if(player.y < 0){
+
+      if (player.y < 0) {
         player.y = 599;
       }
-      
+
       utility.setPlayer(player);
     }
   }
@@ -129,9 +127,8 @@ const serverUpdate = () => {
 
   for (let i = 0; i < bulletKeys.length; i++) {
     const bullet = bullets[bulletKeys[i]];
-  
-    if (bullet !== null && bullet !== undefined && bullet.x !== undefined && bullet.y !== undefined) {
-      
+
+    if (bullet !== null && bullet !== undefined) {
       bullet.x += bullet.speed * bullet.fX;
       bullet.y += bullet.speed * bullet.fY;
 
@@ -141,15 +138,15 @@ const serverUpdate = () => {
     }
   }
 
-  utility.cullBullets(utility.getBullets());
-  
-  let explosions = utility.checkBulletCollisions();
-  
-  if(explosions.length>0){
-      console.dir(explosions);
-      io.in('room1').emit('sentExplosions', explosions);
+  utility.cullBullets();
+  utility.cullPlayers();
+
+  const explosions = utility.checkBulletCollisions();
+
+  if (explosions.length > 0) {
+    console.dir(explosions);
+    io.in('room1').emit('sentExplosions', explosions);
   }
-  
 };
 
 const onReceiveTurning = (sock) => {
@@ -158,11 +155,11 @@ const onReceiveTurning = (sock) => {
   socket.on('turning', (data) => {
     const player = utility.getPlayer(data.hash);
     if (data.turningLeft) {
-      player.hullRotation -= 10;
+      player.hullRotation -= 5;
     }
 
     if (data.turningRight) {
-      player.hullRotation += 10;
+      player.hullRotation += 5;
     }
 
     const asRad = player.hullRotation * (Math.PI / 180);
@@ -203,12 +200,13 @@ const configure = (ioServer) => {
     // fX = cos(theta)
     // fY = sin(theta)
 
-    let tempX = Math.floor(Math.random()*600 +1);
-    
-    let tempY = Math.floor(Math.random()*600 +1);
+    const tempX = Math.floor(Math.random() * 600);
 
-    
+    const tempY = Math.floor(Math.random() * 600);
+
+
     const Player = {
+      hp: 10,
       x: tempX,
       y: tempY,
       fX: 1,
@@ -219,7 +217,7 @@ const configure = (ioServer) => {
       hullRotation: 0,
       turretRotation: 0,
       hash,
-      frame: 1,
+      frame: 0,
     };
     // Add new player data to players
     utility.setPlayer(Player);
