@@ -32,7 +32,6 @@ var redraw = function redraw(time) {
 
   var playerKeys = Object.keys(players);
   var bulletKeys = Object.keys(bullets);
-  var explosionKeys = Object.keys(explosions);
 
   for (var i = 0; i < playerKeys.length; i++) {
     var player = players[playerKeys[i]];
@@ -71,8 +70,6 @@ var redraw = function redraw(time) {
     ctx.restore();
   }
 
-  console.log("#of bullets:" + bulletKeys.length);
-
   for (var _i = 0; _i < bulletKeys.length; _i++) {
     var bullet = bullets[bulletKeys[_i]];
 
@@ -84,19 +81,20 @@ var redraw = function redraw(time) {
 
     ctx.save();
 
-    console.log("X:" + bullet.x);
-    console.log("Y:" + bullet.y);
-
     ctx.translate(bullet.x, bullet.y);
     ctx.rotate(bullet.rotation * (Math.PI / 180));
-    ctx.drawImage(bulletImg, 0, 0, bulletSize.WIDTH, bulletSize.HEIGHT, -bulletSize.WIDTH / 2, -bulletSize.HEIGHT / 2, bulletSize.WIDTH, bulletSize.HEIGHT);
+    ctx.drawImage(bulletImg, 0, 0, bulletSize.WIDTH, bulletSize.HEIGHT, -bulletSize.WIDTH / 4, -bulletSize.HEIGHT / 4, bulletSize.WIDTH / 2, bulletSize.HEIGHT / 2);
     ctx.restore();
   }
 
-  for (var _i2 = 0; _i2 < explosionKeys.length; _i2++) {
-    var explosion = explosions[explosionKeys[_i2]];
+  for (var _i2 = 0; _i2 < explosions.length; _i2++) {
+    var explosion = explosions[_i2];
 
-    ctx.drawImage(explosionImg, 0, 0, explosionSize.WIDTH, explosionSize.HEIGHT, explosion.x, explosion.y, explosionSize.WIDTH, explosionSize.HEIGHT);
+    console.log('drawing explosion');
+
+    ctx.drawImage(explosionImg, 0, 0, explosionSize.WIDTH, explosionSize.HEIGHT, explosion.x - explosionSize.WIDTH / 2, explosion.y - explosionSize.HEIGHT / 2, explosionSize.WIDTH, explosionSize.HEIGHT);
+
+    explosion.lifeFrames--;
   }
 
   animationFrame = requestAnimationFrame(redraw);
@@ -117,7 +115,7 @@ var animationFrame = void 0;
 
 var players = {};
 var bullets = {};
-var explosions = {};
+var explosions = [];
 
 var mousePosition = {
   x: 0,
@@ -252,15 +250,13 @@ var interpolateBullets = function interpolateBullets() {
   }
 };
 
-var updateExplosions = function updateExplosions() {
-  var keys = Object.keys(explosions);
+var cullExplosions = function cullExplosions() {
 
-  for (var i = 0; i < keys.length; i++) {
-    var explosion = explosions[keys[i]];
-    if (explosion.lifeFrames > 0) {
-      explosion.lifeFrames--;
-    } else {
-      delete explosions[keys[i]];
+  for (var i = 0; i < explosions.length; i++) {
+    var explosion = explosions[i];
+    if (explosion.lifeFrames < 0) {
+      explosions.splice(i, 1);
+      console.log('cullingExplosion');
     }
   }
 };
@@ -268,26 +264,27 @@ var updateExplosions = function updateExplosions() {
 var syncBullets = function syncBullets(data) {
   var keys = Object.keys(data);
 
-  console.dir(data);
+  bullets = data;
 
-  for (var i = 0; i < keys.length; i++) {
-    var dataBullet = data[keys[i]];
-
-    if (!bullets[dataBullet.hash]) {
+  /**
+  for (let i = 0; i < keys.length; i++) {
+    let dataBullet = data[keys[i]];
+      if (!bullets[dataBullet.hash]) {
       bullets[dataBullet.hash] = dataBullet;
       return;
     }
-
-    var bullet = bullets[dataBullet.hash];
+      let bullet = bullets[dataBullet.hash];
     bullet.x = dataBullet.x;
     bullet.y = dataBullet.y;
     bullet.fX = dataBullet.fX;
     bullet.fY = dataBullet.fY;
     bullet.speed = dataBullet.speed;
   }
+  **/
 };
 
 var receiveExplosions = function receiveExplosions(data) {
+  console.dir(data[0]);
   explosions = data;
 };
 
@@ -311,15 +308,16 @@ var fireCannon = function fireCannon() {
 var syncPlayers = function syncPlayers(data) {
   var keys = Object.keys(data);
 
-  for (var i = 0; i < keys.length; i++) {
-    var dataPlayer = data[keys[i]];
+  players = data;
 
-    if (!players[dataPlayer.hash]) {
+  /**
+  for (let i = 0; i < keys.length; i++) {
+    let dataPlayer = data[keys[i]];
+      if (!players[dataPlayer.hash]) {
       players[dataPlayer.hash] = dataPlayer;
       return;
     }
-
-    var player = players[dataPlayer.hash];
+      let player = players[dataPlayer.hash];
     player.x = dataPlayer.x;
     player.y = dataPlayer.y;
     player.fX = dataPlayer.fX;
@@ -328,6 +326,7 @@ var syncPlayers = function syncPlayers(data) {
     player.hullRotation = dataPlayer.hullRotation;
     player.turretRotation = dataPlayer.turretRotation;
   }
+  **/
 };
 
 var setPlayer = function setPlayer(data) {
@@ -342,5 +341,5 @@ var setPlayer = function setPlayer(data) {
 var update = function update() {
   //interpolatePlayers();
   //interpolateBullets();
-  updateExplosions();
+  cullExplosions();
 };

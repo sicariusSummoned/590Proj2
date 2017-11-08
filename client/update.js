@@ -19,23 +19,20 @@ const interpolateBullets = () => {
   }
 };
 
-const updateExplosions = () => {
-  let keys = Object.keys(explosions);
-
-  for (let i = 0; i < keys.length; i++) {
-    let explosion = explosions[keys[i]];
-    if (explosion.lifeFrames > 0) {
-      explosion.lifeFrames--;
-    } else {
-      delete explosions[keys[i]];
-    }
+const cullExplosions = () => {
+  
+  for (let i = 0; i < explosions.length; i++) {
+    let explosion = explosions[i];
+    if (explosion.lifeFrames < 0) {
+      explosions.splice(i,1);
+      console.log('cullingExplosion');
+    } 
   }
-}
+};
 
 const syncBullets = (data) => {
   const keys = Object.keys(data);
 
-  console.dir(data);
   
   bullets = data;
   
@@ -60,8 +57,9 @@ const syncBullets = (data) => {
 };
 
 const receiveExplosions = (data) => {
+  console.dir(data[0]);
   explosions = data;
-}
+};
 
 const fireCannon = () => {
   console.log('cannon fired clientside');
@@ -83,6 +81,9 @@ const fireCannon = () => {
 const syncPlayers = (data) => {
   const keys = Object.keys(data);
 
+  players = data;
+  
+  /**
   for (let i = 0; i < keys.length; i++) {
     let dataPlayer = data[keys[i]];
 
@@ -100,8 +101,7 @@ const syncPlayers = (data) => {
     player.hullRotation = dataPlayer.hullRotation;
     player.turretRotation = dataPlayer.turretRotation;
   }
-
-
+  **/
 
 
 };
@@ -118,8 +118,8 @@ const setPlayer = (data) => {
 }
 
 const update = () => {
-  interpolatePlayers();
-  interpolateBullets();
-  updateExplosions();
+  //interpolatePlayers();
+  //interpolateBullets();
+  cullExplosions();
 
 };

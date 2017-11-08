@@ -30,7 +30,6 @@ const redraw = (time) => {
 
   const playerKeys = Object.keys(players);
   const bulletKeys = Object.keys(bullets);
-  const explosionKeys = Object.keys(explosions);
 
   for (let i = 0; i < playerKeys.length; i++) {
     const player = players[playerKeys[i]];
@@ -93,7 +92,6 @@ const redraw = (time) => {
 
   }
 
-  console.log(`#of bullets:${bulletKeys.length}`);
   
   for (let i = 0; i < bulletKeys.length; i++) {
     const bullet = bullets[bulletKeys[i]];
@@ -106,8 +104,6 @@ const redraw = (time) => {
 
     ctx.save();
     
-    console.log(`X:${bullet.x}`);
-    console.log(`Y:${bullet.y}`);
     
     ctx.translate(bullet.x,bullet.y);
     ctx.rotate(bullet.rotation * (Math.PI/180));
@@ -117,28 +113,33 @@ const redraw = (time) => {
       0,
       bulletSize.WIDTH,
       bulletSize.HEIGHT,
-      -bulletSize.WIDTH/2,
-      -bulletSize.HEIGHT/2,
-      bulletSize.WIDTH,
-      bulletSize.HEIGHT
+      -bulletSize.WIDTH/4,
+      -bulletSize.HEIGHT/4,
+      bulletSize.WIDTH/2,
+      bulletSize.HEIGHT/2
     );
     ctx.restore();
   }
 
-  for (let i = 0; i < explosionKeys.length; i++) {
-    const explosion = explosions[explosionKeys[i]];
-
+  
+  for (let i = 0; i < explosions.length; i++) {
+    const explosion = explosions[i];
+    
+    console.log('drawing explosion');
+    
     ctx.drawImage(
       explosionImg,
       0,
       0,
       explosionSize.WIDTH,
       explosionSize.HEIGHT,
-      -explosionSize.WIDTH/2,
-      -explosionSize.HEIGHT/2,
+      explosion.x - explosionSize.WIDTH/2,
+      explosion.y - explosionSize.HEIGHT/2,
       explosionSize.WIDTH,
-      explosionSize.HEIGHT
+      explosionSize.HEIGHT,
     );
+    
+    explosion.lifeFrames--;
   }
 
   animationFrame = requestAnimationFrame(redraw);

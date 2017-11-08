@@ -101,9 +101,27 @@ const serverUpdate = () => {
     const player = players[keys[i]];
 
     if (player !== null && player !== undefined) {
+      
+      
       player.x += player.speed * player.fX;
       player.y += player.speed * player.fY;
 
+      if(player.x >600){
+        player.x = 1;
+      }
+      
+      if(player.x <0){
+        player.x = 599;
+      }
+      
+      if(player.y > 600){
+        player.y = 1;
+      }
+      
+      if(player.y < 0){
+        player.y = 599;
+      }
+      
       utility.setPlayer(player);
     }
   }
@@ -111,24 +129,27 @@ const serverUpdate = () => {
 
   for (let i = 0; i < bulletKeys.length; i++) {
     const bullet = bullets[bulletKeys[i]];
-    console.dir(bullet);
-    if (bullet !== null && bullet !== undefined) {
+  
+    if (bullet !== null && bullet !== undefined && bullet.x !== undefined && bullet.y !== undefined) {
+      
       bullet.x += bullet.speed * bullet.fX;
       bullet.y += bullet.speed * bullet.fY;
 
       utility.setBullet(bullet);
-
-      console.log(`X:${bullet.x}`);
-      console.log(`Y:${bullet.y}`);
     } else {
       console.log('UNDEFINED OR NULL');
     }
   }
 
   utility.cullBullets(utility.getBullets());
-
-
-  io.in('room1').emit('sentExplosions', utility.checkBulletCollisions());
+  
+  let explosions = utility.checkBulletCollisions();
+  
+  if(explosions.length>0){
+      console.dir(explosions);
+      io.in('room1').emit('sentExplosions', explosions);
+  }
+  
 };
 
 const onReceiveTurning = (sock) => {
@@ -182,9 +203,14 @@ const configure = (ioServer) => {
     // fX = cos(theta)
     // fY = sin(theta)
 
+    let tempX = Math.floor(Math.random()*600 +1);
+    
+    let tempY = Math.floor(Math.random()*600 +1);
+
+    
     const Player = {
-      x: 100,
-      y: 100,
+      x: tempX,
+      y: tempY,
       fX: 1,
       fY: 0,
       speed: 0,

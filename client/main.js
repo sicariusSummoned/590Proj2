@@ -12,7 +12,7 @@ let animationFrame;
 
 let players = {};
 let bullets = {};
-let explosions = {};
+let explosions = [];
 
 let mousePosition = {
   x: 0,
@@ -99,6 +99,7 @@ const init = () => {
   bulletImg = document.querySelector('#bullet');
   explosionImg = document.querySelector('#explosion');
   bgImg = document.querySelector('#bg');
+  
 
   canvas = document.querySelector('#canvas');
   ctx = canvas.getContext('2d');
